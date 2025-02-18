@@ -32,7 +32,7 @@ namespace Book_Your_Hotel.Controller
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public ActionResult<HotelsDTO> GetHotel(int id)
+        public async Task<ActionResult<HotelsDTO>> GetHotel(int id)
         {
             if (id == 0)
             {
@@ -40,7 +40,7 @@ namespace Book_Your_Hotel.Controller
                 return BadRequest();
             }
 
-            var hotel = _Db.HotelLists.FirstOrDefault(u => u.Id == id);
+            var hotel = await _Db.HotelLists.FirstOrDefaultAsync(u => u.Id == id);
             if (hotel == null)
             {
                 _logger.LogWarning($"Hotel with id: {id} not found.");
@@ -54,7 +54,7 @@ namespace Book_Your_Hotel.Controller
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public ActionResult<HotelsDTO> CreateHotel([FromBody] HotelCreateDTO newHotel)
+        public async  Task<ActionResult<HotelsDTO>> CreateHotel([FromBody] HotelCreateDTO newHotel)
         {
             if (newHotel == null)
             {
@@ -62,7 +62,7 @@ namespace Book_Your_Hotel.Controller
                 return BadRequest("Hotel data is null");
             }
 
-            if (_Db.HotelLists.FirstOrDefault(u => u.Name.ToLower() == newHotel.Name.ToLower()) != null)
+            if (await _Db.HotelLists.FirstOrDefaultAsync(u => u.Name.ToLower() == newHotel.Name.ToLower()) != null)
             {
                 _logger.LogError($"Hotel creation failed: Hotel with name '{newHotel.Name}' already exists.");
                 ModelState.AddModelError("Custom", "Model already exists.");
@@ -77,8 +77,8 @@ namespace Book_Your_Hotel.Controller
                 Price = newHotel.Price,
                 ContactNumber = newHotel.ContactNumber
             };
-            _Db.HotelLists.Add(hotels);
-            _Db.SaveChanges();
+           await  _Db.HotelLists.AddAsync(hotels);
+          await  _Db.SaveChangesAsync();
             _logger.LogInformation($"Hotel '{newHotel.Name}' created successfully with id: {hotels.Id}");
 
             return CreatedAtAction(nameof(GetHotel), new { id = hotels.Id }, hotels);
@@ -88,7 +88,7 @@ namespace Book_Your_Hotel.Controller
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public IActionResult DeleteHotel(int id)
+        public async Task<IActionResult> DeleteHotel(int id)
         {
             if (id == 0)
             {
@@ -96,7 +96,7 @@ namespace Book_Your_Hotel.Controller
                 return BadRequest();
             }
 
-            var hotel = _Db.HotelLists.FirstOrDefault(u => u.Id == id);
+            var hotel = await _Db.HotelLists.FirstOrDefaultAsync(u => u.Id == id);
             if (hotel == null)
             {
                 _logger.LogWarning($"Hotel with id: {id} not found.");
@@ -104,7 +104,7 @@ namespace Book_Your_Hotel.Controller
             }
 
             _Db.HotelLists.Remove(hotel);
-            _Db.SaveChanges();
+           await _Db.SaveChangesAsync();
             _logger.LogInformation($"Hotel with id: {id} deleted successfully.");
 
             return NoContent();
@@ -114,14 +114,14 @@ namespace Book_Your_Hotel.Controller
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public IActionResult UpdateHotel(int id, [FromBody] HotelUpdateDTO toUpdateDTO)
+        public async Task<IActionResult> UpdateHotel(int id, [FromBody] HotelUpdateDTO toUpdateDTO)
         {
             if (id == 0 || toUpdateDTO.Id == 0)
             {
                 _logger.LogError("Bad request: Hotel id or update data cannot be zero.");
                 return BadRequest();
             }
-            var hotel = _Db.HotelLists.AsNoTracking().FirstOrDefault(u => u.Id == id);
+            var hotel =await  _Db.HotelLists.AsNoTracking().FirstOrDefaultAsync(u => u.Id == id);
 
             if (hotel == null)
             {
@@ -135,7 +135,7 @@ namespace Book_Your_Hotel.Controller
             hotel.Location = toUpdateDTO.Location;
             hotel.ImageUrl = toUpdateDTO.ImageUrl;
             _Db.HotelLists.Update(hotel);
-            _Db.SaveChanges();
+           await _Db.SaveChangesAsync();
 
             _logger.LogInformation($"Hotel with id: {id} updated successfully. New Name: {toUpdateDTO.Name}");
 
