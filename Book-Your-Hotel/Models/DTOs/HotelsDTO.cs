@@ -5,9 +5,11 @@ namespace Book_Your_Hotel.Models.DTOs
     public class HotelsDTO
     {
         public int Id { get; set; }
-        [Required]
-        [MaxLength(30)]    
         public string Name { get; set; }
-
+        public string Location { get; set; }
+        public string ImageUrl { get; set; }
+        public int NumberOfRooms { get; set; }
+        public int Price { get; set; }
+        public string ContactNumber { get; set; }
     }
 }
