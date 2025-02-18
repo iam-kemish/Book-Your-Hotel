@@ -2,6 +2,7 @@
 using Book_Your_Hotel.Models;
 using Book_Your_Hotel.Models.DTOs;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
 namespace Book_Your_Hotel.Controller
@@ -20,13 +21,18 @@ namespace Book_Your_Hotel.Controller
         }
 
         [HttpGet]
-        public ActionResult <IEnumerable<HotelsDTO>> GetAllHotels()
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public ActionResult<IEnumerable<HotelsDTO>> GetAllHotels()
         {
             _logger.LogInformation("Getting all the hotels list");
             return Ok(_Db.HotelLists.ToList());
         }
 
         [HttpGet("{id:int}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         public ActionResult<HotelsDTO> GetHotel(int id)
         {
             if (id == 0)
@@ -47,6 +53,8 @@ namespace Book_Your_Hotel.Controller
         }
 
         [HttpPost]
+        [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public ActionResult<HotelsDTO> CreateHotel([FromBody] HotelsDTO newHotel)
         {
             if (newHotel == null)
@@ -78,6 +86,9 @@ namespace Book_Your_Hotel.Controller
         }
 
         [HttpDelete("{id:int}")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         public IActionResult DeleteHotel(int id)
         {
             if (id == 0)
@@ -101,6 +112,9 @@ namespace Book_Your_Hotel.Controller
         }
 
         [HttpPut("{id:int}", Name = "UpdateHotel")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         public IActionResult UpdateHotel(int id, [FromBody] HotelsDTO toUpdateDTO)
         {
             if (id == 0 || toUpdateDTO.Id == 0)
@@ -108,8 +122,8 @@ namespace Book_Your_Hotel.Controller
                 _logger.LogError("Bad request: Hotel id or update data cannot be zero.");
                 return BadRequest();
             }
+            var hotel = _Db.HotelLists.AsNoTracking().FirstOrDefault(u => u.Id == id);
 
-            var hotel = _Db.HotelLists.FirstOrDefault(u => u.Id == id);
             if (hotel == null)
             {
                 _logger.LogWarning($"Hotel with id: {id} not found for update.");
@@ -117,7 +131,7 @@ namespace Book_Your_Hotel.Controller
             }
 
             hotel.Name = toUpdateDTO.Name;
-            hotel.ContactNumber  = toUpdateDTO.ContactNumber;
+            hotel.ContactNumber = toUpdateDTO.ContactNumber;
             hotel.Price = toUpdateDTO.Price;
             hotel.Location = toUpdateDTO.Location;
             hotel.ImageUrl = toUpdateDTO.ImageUrl;
