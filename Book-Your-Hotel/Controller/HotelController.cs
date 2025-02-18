@@ -3,7 +3,6 @@ using Book_Your_Hotel.Models;
 using Book_Your_Hotel.Models.DTOs;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
 
 namespace Book_Your_Hotel.Controller
 {
@@ -55,7 +54,7 @@ namespace Book_Your_Hotel.Controller
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public ActionResult<HotelsDTO> CreateHotel([FromBody] HotelsDTO newHotel)
+        public ActionResult<HotelsDTO> CreateHotel([FromBody] HotelCreateDTO newHotel)
         {
             if (newHotel == null)
             {
@@ -80,9 +79,9 @@ namespace Book_Your_Hotel.Controller
             };
             _Db.HotelLists.Add(hotels);
             _Db.SaveChanges();
-            _logger.LogInformation($"Hotel '{newHotel.Name}' created successfully with id: {newHotel.Id}");
+            _logger.LogInformation($"Hotel '{newHotel.Name}' created successfully with id: {hotels.Id}");
 
-            return CreatedAtAction(nameof(GetHotel), new { id = newHotel.Id }, newHotel);
+            return CreatedAtAction(nameof(GetHotel), new { id = hotels.Id }, hotels);
         }
 
         [HttpDelete("{id:int}")]
@@ -115,7 +114,7 @@ namespace Book_Your_Hotel.Controller
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public IActionResult UpdateHotel(int id, [FromBody] HotelsDTO toUpdateDTO)
+        public IActionResult UpdateHotel(int id, [FromBody] HotelUpdateDTO toUpdateDTO)
         {
             if (id == 0 || toUpdateDTO.Id == 0)
             {
