@@ -2,6 +2,7 @@
 using Book_Your_Hotel.Database;
 using Book_Your_Hotel.Models;
 using Book_Your_Hotel.Models.DTOs;
+using Book_Your_Hotel.Repositary.IRepositary;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -12,13 +13,13 @@ namespace Book_Your_Hotel.Controller
     public class HotelController : ControllerBase
     {
         private readonly ILogger<HotelController> _logger;
-        private readonly ApplicationDbContext _Db;
+        private readonly IHotelRepo _IHotel;
         private readonly IMapper _IMapper;
 
-        public HotelController(ILogger<HotelController> logger, ApplicationDbContext applicationDbContext, IMapper mapper)
+        public HotelController(ILogger<HotelController> logger, ApplicationDbContext applicationDbContext, IMapper mapper, IHotelRepo hotelRepo)
         {
             _logger = logger;
-            _Db = applicationDbContext;
+            _IHotel = hotelRepo;
             _IMapper = mapper;  
         }
 
@@ -28,7 +29,7 @@ namespace Book_Your_Hotel.Controller
         public async Task <ActionResult<IEnumerable<HotelsDTO>>> GetAllHotels()
         {
             _logger.LogInformation("Getting all the hotels list");
-           IEnumerable<Hotels> hotelLists = await _Db.HotelLists.ToListAsync();
+           IEnumerable<Hotels> hotelLists = await _IHotel.GetAllAsync();
             return Ok(_IMapper.Map<List<HotelsDTO>>(hotelLists));
         }
 
@@ -44,7 +45,7 @@ namespace Book_Your_Hotel.Controller
                 return BadRequest();
             }
 
-            var hotel = await _Db.HotelLists.FirstOrDefaultAsync(u => u.Id == id);
+            var hotel = await _IHotel.GetAsync(u => u.Id == id);
             if (hotel == null)
             {
                 _logger.LogWarning($"Hotel with id: {id} not found.");
@@ -66,7 +67,7 @@ namespace Book_Your_Hotel.Controller
                 return BadRequest("Hotel data is null");
             }
 
-            if (await _Db.HotelLists.FirstOrDefaultAsync(u => u.Name.ToLower() == newHotel.Name.ToLower()) != null)
+            if (await _IHotel.GetAsync(u => u.Name.ToLower() == newHotel.Name.ToLower()) != null)
             {
                 _logger.LogError($"Hotel creation failed: Hotel with name '{newHotel.Name}' already exists.");
                 ModelState.AddModelError("Custom", "Model already exists.");
@@ -83,8 +84,8 @@ namespace Book_Your_Hotel.Controller
             //    Price = newHotel.Price,
             //    ContactNumber = newHotel.ContactNumber
             //};
-           await  _Db.HotelLists.AddAsync(hotels);
-          await  _Db.SaveChangesAsync();
+           await  _IHotel.CreateAsync(hotels);
+         
             _logger.LogInformation($"Hotel '{newHotel.Name}' created successfully with id: {hotels.Id}");
 
             return CreatedAtAction(nameof(GetHotel), new { id = hotels.Id }, hotels);
@@ -102,15 +103,15 @@ namespace Book_Your_Hotel.Controller
                 return BadRequest();
             }
 
-            var hotel = await _Db.HotelLists.FirstOrDefaultAsync(u => u.Id == id);
+            var hotel = await _IHotel.GetAsync(u => u.Id == id);
             if (hotel == null)
             {
                 _logger.LogWarning($"Hotel with id: {id} not found.");
                 return NotFound();
             }
 
-            _Db.HotelLists.Remove(hotel);
-           await _Db.SaveChangesAsync();
+           await _IHotel.RemoveAsync(hotel);
+          
             _logger.LogInformation($"Hotel with id: {id} deleted successfully.");
 
             return NoContent();
@@ -141,8 +142,7 @@ namespace Book_Your_Hotel.Controller
             //hotel.Price = toUpdateDTO.Price;
             //hotel.Location = toUpdateDTO.Location;
             //hotel.ImageUrl = toUpdateDTO.ImageUrl;
-            _Db.HotelLists.Update(hotel);
-           await _Db.SaveChangesAsync();
+           await _IHotel.UpdateAsync(hotel);
 
             _logger.LogInformation($"Hotel with id: {id} updated successfully. New Name: {toUpdateDTO.Name}");
 
