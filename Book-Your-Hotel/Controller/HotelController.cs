@@ -128,21 +128,16 @@ namespace Book_Your_Hotel.Controller
                 _logger.LogError("Bad request: Hotel id or update data cannot be zero.");
                 return BadRequest();
             }
-            //var hotel =await  _Db.HotelLists.AsNoTracking().FirstOrDefaultAsync(u => u.Id == id);
+            var existingHotel = await _IHotel.GetAsync(u => u.Id == id, tracked: true);
 
-            //if (hotel == null)
-            //{
-            //    _logger.LogWarning($"Hotel with id: {id} not found for update.");
-            //    return NotFound();
-            //}
-            Hotels hotel = _IMapper.Map<Hotels>(toUpdateDTO);
-
-            //hotel.Name = toUpdateDTO.Name;
-            //hotel.ContactNumber = toUpdateDTO.ContactNumber;
-            //hotel.Price = toUpdateDTO.Price;
-            //hotel.Location = toUpdateDTO.Location;
-            //hotel.ImageUrl = toUpdateDTO.ImageUrl;
-           await _IHotel.UpdateAsync(hotel);
+            if (existingHotel == null)
+            {
+                _logger.LogWarning($"Hotel with id: {id} not found for update.");
+                return NotFound();
+            }
+          _IMapper.Map(toUpdateDTO,existingHotel);
+          
+            await _IHotel.UpdateAsync(existingHotel);
 
             _logger.LogInformation($"Hotel with id: {id} updated successfully. New Name: {toUpdateDTO.Name}");
 

@@ -6,61 +6,22 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Book_Your_Hotel.Repositary
 {
-    public class HotelCLass : IHotelRepo
+    public class HotelCLass : MainRepoClass<Hotels>,  IHotelRepo
     {
         private readonly ApplicationDbContext _Db;
 
-        public HotelCLass(ApplicationDbContext applicationDbContext)
+        public HotelCLass(ApplicationDbContext applicationDbContext) : base(applicationDbContext)
         {
             _Db = applicationDbContext;
         }
-        public async Task CreateAsync(Hotels hotels)
-        {
-          await _Db.HotelLists.AddAsync(hotels);
-            await SaveAsync();
-        }
+        
 
-        public async Task<Hotels> GetAsync(Expression<Func<Hotels, bool>> filter = null, bool tracked = true)
+        public async Task<Hotels> UpdateAsync(Hotels hotels)
         {
-            IQueryable<Hotels> Query = _Db.HotelLists;
-
-            if (!tracked)
-            {
-                Query.AsNoTracking();
-            }
-            if(filter != null)
-            {
-                Query = Query.Where(filter);
-            }
-            return await Query.FirstOrDefaultAsync();
-        }
-
-        public async Task<List<Hotels>> GetAllAsync(Expression<Func<Hotels, bool>> filter = null)
-        {
-            IQueryable<Hotels> Query = _Db.HotelLists;
-            if (filter != null)
-            {
-                Query = Query.Where(filter);
-            };
-            return await Query.ToListAsync();
-        }
-
-        public async Task RemoveAsync(Hotels hotels)
-        {
-             _Db.HotelLists.Remove(hotels);
-            await SaveAsync();
-        }
-        public async Task UpdateAsync(Hotels hotels)
-        {
+            hotels.UpdatedOn = DateTime.Now;
            _Db.HotelLists.Update(hotels);
-            await SaveAsync();
-           
+           await _Db.SaveChangesAsync();
+            return hotels;
         }
-        public async Task SaveAsync()
-        {
-            await _Db.SaveChangesAsync();
-        }
-
-       
     }
 }
