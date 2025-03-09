@@ -12,6 +12,8 @@ namespace Book_Your_Hotel.Database
 
         public DbSet<Hotels> HotelLists { get; set; }
 
+        public DbSet<HotelNumbers> HotelNumbers { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Hotels>().HasData(

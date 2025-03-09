@@ -4,6 +4,7 @@ using Book_Your_Hotel.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Book_Your_Hotel.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250309104224_InitialSecond")]
+    partial class InitialSecond
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -21,26 +24,6 @@ namespace Book_Your_Hotel.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
-
-            modelBuilder.Entity("Book_Your_Hotel.Models.HotelNumbers", b =>
-                {
-                    b.Property<int>("HotelNumber")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("CreatedDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime>("LastUpdatedDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("SpecialDetails")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("HotelNumber");
-
-                    b.ToTable("HotelNumbers");
-                });
 
             modelBuilder.Entity("Book_Your_Hotel.Models.Hotels", b =>
                 {
