@@ -8,10 +8,16 @@ namespace Book_Your_Hotel.Mapper
     {
         public MappingConfig()
         {
+            //for hotel
             CreateMap<Hotels, HotelsDTO>().ReverseMap();
           
             CreateMap<Hotels,HotelCreateDTO>().ReverseMap();
             CreateMap<Hotels,HotelUpdateDTO>().ReverseMap();
+
+            //for hotel numbers.
+            CreateMap<HotelNumbers, HotelNoDTO>().ReverseMap();
+            CreateMap<HotelNumbers, HotelNoCreateDTO>().ReverseMap();
+            CreateMap<HotelNumbers, HotelNoUpdateDTO>().ReverseMap();
 
             
         }

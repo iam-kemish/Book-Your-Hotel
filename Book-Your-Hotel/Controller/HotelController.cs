@@ -82,7 +82,6 @@ namespace Book_Your_Hotel.Controller
         public async Task<ActionResult<APIResponse>> CreateHotel([FromBody] HotelCreateDTO newHotel)
         {
             
-
             if (newHotel == null)
             {
                 response.HttpStatusCode = HttpStatusCode.BadRequest;
@@ -116,7 +115,6 @@ namespace Book_Your_Hotel.Controller
         public async Task<ActionResult<APIResponse>> DeleteHotel(int id)
         {
             
-
             if (id == 0)
             {
                 response.HttpStatusCode = HttpStatusCode.BadRequest;
@@ -148,7 +146,6 @@ namespace Book_Your_Hotel.Controller
         public async Task<ActionResult<APIResponse>> UpdateHotel(int id, [FromBody] HotelUpdateDTO toUpdateDTO)
         {
             
-
             if (id == 0 || toUpdateDTO.Id == 0)
             {
                 response.HttpStatusCode = HttpStatusCode.BadRequest;
