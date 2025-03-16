@@ -15,13 +15,14 @@ namespace Book_Your_Hotel.Controller
         private readonly ILogger<HotelController> _logger;
         private readonly APIResponse response;
         private readonly IMapper _IMapper;
-
-        public HotelNumerController(IHotelNoRepo hotelNoRepo, ILogger<HotelController> logger, IMapper mapper)
+        private readonly IHotelRepo _IHotel;
+        public HotelNumerController(IHotelNoRepo hotelNoRepo, ILogger<HotelController> logger, IMapper mapper, IHotelRepo iHotel)
         {
             _IHotelNo = hotelNoRepo;
             _logger = logger;
             response = new APIResponse();
             _IMapper = mapper;
+            _IHotel = iHotel;
         }
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
@@ -84,6 +85,19 @@ namespace Book_Your_Hotel.Controller
                 response.Errors = new List<string> { "Hotel number data is null" };
                 return BadRequest(response);
             }
+            if (await _IHotel.GetAsync(u => u.Id == newHotelNumber.HotelID) == null)
+            {
+                ModelState.AddModelError("HotelID", "Hotel id is invalid"); 
+
+                response.HttpStatusCode = HttpStatusCode.BadRequest;
+                response.IsSuccess = false;
+                response.Errors = ModelState.Values.SelectMany(v => v.Errors)
+                                                   .Select(e => e.ErrorMessage)
+                                                   .ToList();
+
+                return BadRequest(response);
+            }
+
             HotelNumbers hotelNumbers = _IMapper.Map<HotelNumbers>(newHotelNumber);
             await _IHotelNo.CreateAsync(hotelNumbers);
 
