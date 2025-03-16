@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Book_Your_Hotel.Migrations
 {
     /// <inheritdoc />
-    public partial class Initial : Migration
+    public partial class ForeignKeyAdded : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -33,6 +33,27 @@ namespace Book_Your_Hotel.Migrations
                     table.PrimaryKey("PK_HotelLists", x => x.Id);
                 });
 
+            migrationBuilder.CreateTable(
+                name: "HotelNumbers",
+                columns: table => new
+                {
+                    HotelNumber = table.Column<int>(type: "int", nullable: false),
+                    HotelID = table.Column<int>(type: "int", nullable: false),
+                    SpecialDetails = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    LastUpdatedDate = table.Column<DateTime>(type: "datetime2", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_HotelNumbers", x => x.HotelNumber);
+                    table.ForeignKey(
+                        name: "FK_HotelNumbers_HotelLists_HotelID",
+                        column: x => x.HotelID,
+                        principalTable: "HotelLists",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
             migrationBuilder.InsertData(
                 table: "HotelLists",
                 columns: new[] { "Id", "ContactNumber", "CreatedOn", "ImageUrl", "Location", "Name", "NumberOfRooms", "Price", "UpdatedOn" },
@@ -47,11 +68,19 @@ namespace Book_Your_Hotel.Migrations
                     { 7, "+1-9800000007", new DateTime(2024, 1, 7, 9, 55, 0, 0, DateTimeKind.Unspecified), "https://example.com/skyline-suites.jpg", "New York, USA", "Skyline Suites", 300, 1600, new DateTime(2024, 1, 7, 9, 55, 0, 0, DateTimeKind.Unspecified) },
                     { 8, "+62-9800000008", new DateTime(2024, 1, 8, 16, 40, 0, 0, DateTimeKind.Unspecified), "https://example.com/serene-beach.jpg", "Bali, Indonesia", "Serene Beach Resort", 180, 1220, new DateTime(2024, 1, 8, 16, 40, 0, 0, DateTimeKind.Unspecified) }
                 });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_HotelNumbers_HotelID",
+                table: "HotelNumbers",
+                column: "HotelID");
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.DropTable(
+                name: "HotelNumbers");
+
             migrationBuilder.DropTable(
                 name: "HotelLists");
         }

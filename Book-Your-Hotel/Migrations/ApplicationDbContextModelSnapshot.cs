@@ -30,6 +30,9 @@ namespace Book_Your_Hotel.Migrations
                     b.Property<DateTime>("CreatedDate")
                         .HasColumnType("datetime2");
 
+                    b.Property<int>("HotelID")
+                        .HasColumnType("int");
+
                     b.Property<DateTime>("LastUpdatedDate")
                         .HasColumnType("datetime2");
 
@@ -38,6 +41,8 @@ namespace Book_Your_Hotel.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("HotelNumber");
+
+                    b.HasIndex("HotelID");
 
                     b.ToTable("HotelNumbers");
                 });
@@ -179,6 +184,17 @@ namespace Book_Your_Hotel.Migrations
                             Price = 1220,
                             UpdatedOn = new DateTime(2024, 1, 8, 16, 40, 0, 0, DateTimeKind.Unspecified)
                         });
+                });
+
+            modelBuilder.Entity("Book_Your_Hotel.Models.HotelNumbers", b =>
+                {
+                    b.HasOne("Book_Your_Hotel.Models.Hotels", "Hotels")
+                        .WithMany()
+                        .HasForeignKey("HotelID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Hotels");
                 });
 #pragma warning restore 612, 618
         }

@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Book_Your_Hotel.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250309084126_Initial")]
-    partial class Initial
+    [Migration("20250316083901_ForeignKeyAdded")]
+    partial class ForeignKeyAdded
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -24,6 +24,31 @@ namespace Book_Your_Hotel.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
+
+            modelBuilder.Entity("Book_Your_Hotel.Models.HotelNumbers", b =>
+                {
+                    b.Property<int>("HotelNumber")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("HotelID")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("LastUpdatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("SpecialDetails")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("HotelNumber");
+
+                    b.HasIndex("HotelID");
+
+                    b.ToTable("HotelNumbers");
+                });
 
             modelBuilder.Entity("Book_Your_Hotel.Models.Hotels", b =>
                 {
@@ -162,6 +187,17 @@ namespace Book_Your_Hotel.Migrations
                             Price = 1220,
                             UpdatedOn = new DateTime(2024, 1, 8, 16, 40, 0, 0, DateTimeKind.Unspecified)
                         });
+                });
+
+            modelBuilder.Entity("Book_Your_Hotel.Models.HotelNumbers", b =>
+                {
+                    b.HasOne("Book_Your_Hotel.Models.Hotels", "Hotels")
+                        .WithMany()
+                        .HasForeignKey("HotelID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Hotels");
                 });
 #pragma warning restore 612, 618
         }
