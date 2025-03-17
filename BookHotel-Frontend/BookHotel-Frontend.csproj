@@ -8,6 +8,11 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="AutoMapper" Version="14.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Book-Your-Hotel\Book-Your-Hotel.csproj" />
     <ProjectReference Include="..\BookHotel-Utilities\BookHotel-Utilities.csproj" />
   </ItemGroup>
 
