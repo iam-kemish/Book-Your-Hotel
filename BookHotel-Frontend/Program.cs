@@ -1,12 +1,16 @@
 
 
 using BookHotel_Frontend.Mapper;
+using BookHotel_Frontend.Services;
+using BookHotel_Frontend.Services.IServices;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 builder.Services.AddAutoMapper(typeof(MappingConfig));
+builder.Services.AddHttpClient<IHotelService, HotelServiceClass>();
+builder.Services.AddScoped<IHotelService,HotelServiceClass>();  
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
