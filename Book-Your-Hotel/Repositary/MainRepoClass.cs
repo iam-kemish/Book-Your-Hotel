@@ -3,6 +3,7 @@ using Book_Your_Hotel.Models;
 using System.Linq.Expressions;
 using Book_Your_Hotel.Repositary.IRepositary;
 using Microsoft.EntityFrameworkCore;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace Book_Your_Hotel.Repositary
 {
@@ -22,7 +23,7 @@ namespace Book_Your_Hotel.Repositary
             await SaveAsync();
         }
 
-        public async Task<T> GetAsync(Expression<Func<T, bool>> filter = null, bool tracked = true)
+        public async Task<T> GetAsync(Expression<Func<T, bool>> filter = null, bool tracked = true, string? includeProperties = null)
         {
             IQueryable<T> Query = DbSet;
 
@@ -34,16 +35,30 @@ namespace Book_Your_Hotel.Repositary
             {
                 Query = Query.Where(filter);
             }
+            if (includeProperties != null)
+            {
+                foreach (var includeProp in includeProperties.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries))
+                {
+                    Query = Query.Include(includeProp);
+                }
+            }
             return await Query.FirstOrDefaultAsync();
         }
 
-        public async Task<List<T>> GetAllAsync(Expression<Func<T, bool>>? filter = null)
+        public async Task<List<T>> GetAllAsync(Expression<Func<T, bool>>? filter = null, string? includeProperties = null)
         {
             IQueryable<T> Query = DbSet;
             if (filter != null)
             {
                 Query = Query.Where(filter);
             };
+            if (includeProperties != null)
+            {
+                foreach (var includeProp in includeProperties.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries))
+                {
+                    Query = Query.Include(includeProp);
+                }
+            }
             return await Query.ToListAsync();
         }
 

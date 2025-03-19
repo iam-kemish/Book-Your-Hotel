@@ -10,7 +10,10 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllersWithViews();
 builder.Services.AddAutoMapper(typeof(MappingConfig));
 builder.Services.AddHttpClient<IHotelService, HotelServiceClass>();
-builder.Services.AddScoped<IHotelService,HotelServiceClass>();  
+builder.Services.AddScoped<IHotelService,HotelServiceClass>();
+
+builder.Services.AddHttpClient<IHotelNoService, HotelNoServiceClass>();
+builder.Services.AddScoped<IHotelNoService, HotelNoServiceClass>();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

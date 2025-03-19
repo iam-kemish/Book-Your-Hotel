@@ -10,5 +10,7 @@ namespace Book_Your_Hotel.Models.DTOs
         public int HotelID { get; set; }
         public string SpecialDetails { get; set; }
 
+        public HotelsDTO Hotels { get; set; }
+
     }
 }

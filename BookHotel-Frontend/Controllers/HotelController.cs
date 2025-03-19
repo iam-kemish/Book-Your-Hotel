@@ -86,14 +86,13 @@ namespace BookHotel_Frontend.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Delete(HotelsDTO hotelsDTO)
         {
-            if (ModelState.IsValid)
-            {
+          
                 var response = await _IHotel.DeleteAsync<APIResponse>(hotelsDTO.Id);
                 if (response != null && response.IsSuccess)
                 {
                     return RedirectToAction(nameof(Index));
 
-                }
+                
             }
             return View(hotelsDTO);
         }
