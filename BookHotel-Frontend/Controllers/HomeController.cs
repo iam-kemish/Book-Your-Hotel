@@ -1,21 +1,33 @@
 using System.Diagnostics;
+using AutoMapper;
 using BookHotel_Frontend.Models;
+using BookHotel_Frontend.Models.DTOs;
+using BookHotel_Frontend.Services.IServices;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 
 namespace BookHotel_Frontend.Controllers
 {
     public class HomeController : Controller
     {
-        private readonly ILogger<HomeController> _logger;
+        private readonly IHotelService _IHotel;
+        private readonly IMapper _IMapper;
 
-        public HomeController(ILogger<HomeController> logger)
+        public HomeController(IHotelService hotelService, IMapper mapper)
         {
-            _logger = logger;
+            _IHotel = hotelService;
+            _IMapper = mapper;
         }
-
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
-            return View();
+            List<HotelsDTO> ResultedList = new();
+            var response = await _IHotel.GetAllAsync<APIResponse>();
+            if (response != null && response.IsSuccess)
+            {
+                ResultedList = JsonConvert.DeserializeObject<List<HotelsDTO>>(Convert.ToString(response.Result));
+
+            }
+            return View(ResultedList);
         }
 
         public IActionResult Privacy()

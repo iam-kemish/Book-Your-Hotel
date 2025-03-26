@@ -4,6 +4,7 @@ using Book_Your_Hotel.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Book_Your_Hotel.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250326075241_Images")]
+    partial class Images
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -135,6 +138,42 @@ namespace Book_Your_Hotel.Migrations
                             NumberOfRooms = 1200,
                             Price = 1180,
                             UpdatedOn = new DateTime(2024, 1, 4, 8, 45, 0, 0, DateTimeKind.Unspecified)
+                        },
+                        new
+                        {
+                            Id = 5,
+                            ContactNumber = "+971-9800000005",
+                            CreatedOn = new DateTime(2024, 1, 5, 17, 20, 0, 0, DateTimeKind.Unspecified),
+                            ImageUrl = "https://www.dotnetmastery.com/bluevillaimages/villa5.jpg",
+                            Location = "Dubai, UAE",
+                            Name = "Desert Rose Inn",
+                            NumberOfRooms = 250,
+                            Price = 1500,
+                            UpdatedOn = new DateTime(2024, 1, 5, 17, 20, 0, 0, DateTimeKind.Unspecified)
+                        },
+                        new
+                        {
+                            Id = 6,
+                            ContactNumber = "+41-9800000006",
+                            CreatedOn = new DateTime(2024, 1, 6, 11, 10, 0, 0, DateTimeKind.Unspecified),
+                            ImageUrl = "https://unsplash.com/photos/blue-body-of-water-in-front-of-building-near-trees-during-nighttime-M7GddPqJowg",
+                            Location = "Zermatt, Switzerland",
+                            Name = "Alpine Lodge",
+                            NumberOfRooms = 90,
+                            Price = 1400,
+                            UpdatedOn = new DateTime(2024, 1, 6, 11, 10, 0, 0, DateTimeKind.Unspecified)
+                        },
+                        new
+                        {
+                            Id = 7,
+                            ContactNumber = "+1-9800000007",
+                            CreatedOn = new DateTime(2024, 1, 7, 9, 55, 0, 0, DateTimeKind.Unspecified),
+                            ImageUrl = "https://unsplash.com/photos/gray-table-lamp-beside-white-bed-pillow-uocSnWMhnAs",
+                            Location = "New York, USA",
+                            Name = "Skyline Suites",
+                            NumberOfRooms = 300,
+                            Price = 1600,
+                            UpdatedOn = new DateTime(2024, 1, 7, 9, 55, 0, 0, DateTimeKind.Unspecified)
                         });
                 });
 
