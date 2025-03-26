@@ -1,8 +1,11 @@
 ﻿using AutoMapper;
+
 using BookHotel_Frontend.Models;
 using BookHotel_Frontend.Models.DTOs;
+using BookHotel_Frontend.Models.DTOs.ViewModels;
 using BookHotel_Frontend.Services.IServices;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Newtonsoft.Json;
 
 namespace BookHotel_Frontend.Controllers
@@ -11,11 +14,12 @@ namespace BookHotel_Frontend.Controllers
     {
         private readonly IHotelNoService _IHotelNo;
         private readonly IMapper _IMapper;
-
-        public HotelNoController(IHotelNoService hotelNoService, IMapper mapper)
+        private readonly IHotelService _IHotelService;
+        public HotelNoController(IHotelNoService hotelNoService, IMapper mapper, IHotelService IHotelService)
         {
             _IHotelNo = hotelNoService;
             _IMapper = mapper;
+           _IHotelService = IHotelService;
         }
         public async Task<IActionResult> Index()
         {
@@ -30,12 +34,24 @@ namespace BookHotel_Frontend.Controllers
         }
         public async Task<IActionResult> Create()
         {
-            return View();
+            HotelNoCreateVM hotelNoCreateVM = new HotelNoCreateVM();
+            var response = await _IHotelService.GetAllAsync<APIResponse>();
+            if (response != null && response.IsSuccess)
+            {
+                hotelNoCreateVM.HotelLists = JsonConvert.DeserializeObject<List<HotelsDTO>>(Convert.ToString(response.Result)).Select(u => new SelectListItem
+                {
+                    Text = u.Name,
+                    Value = u.Id.ToString()
+                });
+
+            }
+                return View(hotelNoCreateVM);
         }
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(HotelNoCreateDTO hotelNoCreateDTO)
         {
+
             if (ModelState.IsValid)
             {
 
