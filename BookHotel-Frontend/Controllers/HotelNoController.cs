@@ -49,20 +49,20 @@ namespace BookHotel_Frontend.Controllers
         }
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(HotelNoCreateDTO hotelNoCreateDTO)
+        public async Task<IActionResult> Create(HotelNoCreateVM hotelNoCreateVM)
         {
 
             if (ModelState.IsValid)
             {
 
-                var response = await _IHotelNo.CreateAsync<APIResponse>(hotelNoCreateDTO);
+                var response = await _IHotelNo.CreateAsync<APIResponse>(hotelNoCreateVM.HotelNoCreateDTO);
                 if (response != null && response.IsSuccess)
                 {
                     return RedirectToAction(nameof(Index));
 
                 }
             }
-            return View(hotelNoCreateDTO);
+            return View(hotelNoCreateVM);
         }
 
         public async Task<IActionResult> Update(int HotelNoId)

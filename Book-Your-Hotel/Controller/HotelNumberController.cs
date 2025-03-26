@@ -85,9 +85,9 @@ namespace Book_Your_Hotel.Controller
                 response.Errors = new List<string> { "Hotel number data is null" };
                 return BadRequest(response);
             }
-            if (await _IHotel.GetAsync(u => u.Id == newHotelNumber.HotelID) == null)
+            if (await _IHotel.GetAsync(u => u.Id == newHotelNumber.HotelID) != null)
             {
-                ModelState.AddModelError("HotelID", "Hotel id is invalid"); 
+                ModelState.AddModelError("Errors", "Hotel id is invalid"); 
 
                 response.HttpStatusCode = HttpStatusCode.BadRequest;
                 response.IsSuccess = false;

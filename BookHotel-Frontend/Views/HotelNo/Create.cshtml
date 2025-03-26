@@ -1,4 +1,4 @@
-﻿@* @model HotelNoCreateDTO
+﻿@model HotelNoCreateVM
 
 <form asp-action="Create">
     <br />
@@ -10,32 +10,32 @@
             <div asp-validation-summary="All" class="text-danger"></div>
 
             <div class="col-2">
-                <label asp-for="HotelNumber" class="control-label pt-2" style="font-size:20px;"></label>
+                <label asp-for="HotelNoCreateDTO.HotelNumber" class="control-label pt-2" style="font-size:20px;"></label>
             </div>
             <div class="col-10 pb-3">
-                <input asp-for="VillaNumber.VillaNo" class="form-control" />
-                <span asp-validation-for="VillaNumber.VillaNo" class="text-danger"></span>
+                <input asp-for="HotelNoCreateDTO.HotelNumber" class="form-control" />
+                <span asp-validation-for="HotelNoCreateDTO.HotelNumber" class="text-danger"></span>
             </div>
 
             <div class="col-2">
-                <label asp-for="VillaNumber.VillaID" class="control-label pt-2" style="font-size:20px;"></label>
+                <label asp-for="HotelNoCreateDTO.HotelID" class="control-label pt-2" style="font-size:20px;"></label>
             </div>
             <div class="col-10 pb-3">
-                <select asp-for="VillaNumber.VillaID" class="form-select" asp-items="@Model.VillaList">
-                    <option disabled selected>--Select Villa--</option>
+                <select asp-for="HotelNoCreateDTO.HotelID" class="form-select" asp-items="@Model.HotelLists">
+                    <option disabled selected>--Select Hotel--</option>
                 </select>
-                <span asp-validation-for="VillaNumber.VillaID" class="text-danger"></span>
+                <span asp-validation-for="HotelNoCreateDTO.HotelID" class="text-danger"></span>
             </div>
             <div class="col-2">
-                <label asp-for="VillaNumber.SpecialDetails" class="control-label pt-2" style="font-size:20px;"></label>
+                <label asp-for="HotelNoCreateDTO.SpecialDetails" class="control-label pt-2" style="font-size:20px;"></label>
             </div>
             <div class="col-10 pb-3">
-                <textarea asp-for="VillaNumber.SpecialDetails" class="form-control" rows="5"></textarea>
-                <span asp-validation-for="VillaNumber.SpecialDetails" class="text-danger"></span>
+                <textarea asp-for="HotelNoCreateDTO.SpecialDetails" class="form-control" rows="5"></textarea>
+                <span asp-validation-for="HotelNoCreateDTO.SpecialDetails" class="text-danger"></span>
             </div>
-           
+
             <div class="col-5 offset-2">
-                <a asp-action="IndexVillaNumber" asp-controller="VillaNumber" class="btn-primary btn form-control ">Back to List</a>
+                <a asp-action="Index" asp-controller="HotelNo" class="btn-primary btn form-control ">Back to List</a>
             </div>
             <div class="col-5">
                 <input type="submit" value="Create" class="btn btn-success form-control" />
@@ -45,6 +45,7 @@
 </form>
 
 
+
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
-} *@
+}
