@@ -64,7 +64,7 @@ namespace BookHotel_Frontend.Controllers
                 {
                     if (response.Errors.Count > 0)
                     {
-                        ModelState.AddModelError("Error", "Invalid id, seems you have tried to manipulate already exisiting data. Please recheck");
+                        ModelState.AddModelError("Error", response.Errors.FirstOrDefault());
                     }
             }
             }
@@ -87,54 +87,96 @@ namespace BookHotel_Frontend.Controllers
 
         public async Task<IActionResult> Update(int HotelNoId)
         {
+            HotelNoUpdateVM hotelNoUpdateVM = new();
             var response = await _IHotelNo.GetAsync<APIResponse>(HotelNoId);
             if (response != null && response.IsSuccess)
             {
-                HotelNoDTO hotelNoDTO = JsonConvert.DeserializeObject<HotelNoDTO>(Convert.ToString(response.Result));
-                return View(_IMapper.Map<HotelNoUpdateDTO>(hotelNoDTO));
+               HotelNoDTO hotelNoDto = JsonConvert.DeserializeObject<HotelNoDTO>(Convert.ToString(response.Result));
+             hotelNoUpdateVM.hotelNoUpdateDTO =   _IMapper.Map<HotelNoUpdateDTO>(hotelNoDto);
             }
-            return NotFound();
+            var res = await _IHotelService.GetAllAsync<APIResponse>();
+            if (res != null && res.IsSuccess)
+            {
+                hotelNoUpdateVM.HotelLists = JsonConvert.DeserializeObject<List<HotelsDTO>>(Convert.ToString(res.Result)).Select(u => new SelectListItem
+                {
+                    Text = u.Name,
+                    Value = u.Id.ToString()
+                });
+
+            }
+            return View(hotelNoUpdateVM);
         }
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Update(HotelNoUpdateDTO hotelNoUpdateDTO)
+        public async Task<IActionResult> Update(HotelNoUpdateVM hotelNoUpdateVM)
         {
             if (ModelState.IsValid)
             {
-                var response = await _IHotelNo.UpdateAsync<APIResponse>(hotelNoUpdateDTO);
+
+                var response = await _IHotelNo.UpdateAsync<APIResponse>(hotelNoUpdateVM.hotelNoUpdateDTO);
                 if (response != null && response.IsSuccess)
                 {
                     return RedirectToAction(nameof(Index));
+
                 }
+                else
+                {
+                    if (response.Errors.Count > 0)
+                    {
+                        ModelState.AddModelError("Error", response.Errors.FirstOrDefault());
+                    }
+                }
+            }
+            var res = await _IHotelService.GetAllAsync<APIResponse>();
+            if (res != null && res.IsSuccess)
+            {
+               hotelNoUpdateVM.HotelLists = JsonConvert.DeserializeObject<List<HotelsDTO>>(Convert.ToString(res.Result)).Select(u => new SelectListItem
+                {
+                    Text = u.Name,
+                    Value = u.Id.ToString()
+                });
 
             }
-            return View(hotelNoUpdateDTO);
+
+
+            return View(hotelNoUpdateVM);
         }
     
      public async Task<IActionResult> Delete(int HotelNoId)
         {
+            HotelNoDeleteVM hotelNoDeleteVM = new();
             var response = await _IHotelNo.GetAsync<APIResponse>(HotelNoId);
             if (response != null && response.IsSuccess)
             {
-                HotelNoDTO hotelsNoDTO = JsonConvert.DeserializeObject<HotelNoDTO>(Convert.ToString(response.Result));
-                return View(hotelsNoDTO);
+                HotelNoDTO HotelNoDto = JsonConvert.DeserializeObject<HotelNoDTO>(Convert.ToString(response.Result));
+                hotelNoDeleteVM.hotelNoDTO = _IMapper.Map<HotelNoDTO>(hotelNoDeleteVM.hotelNoDTO);
+            }
+            var res = await _IHotelService.GetAllAsync<APIResponse>();
+            if (res != null && res.IsSuccess)
+            {
+               hotelNoDeleteVM.HotelLists = JsonConvert.DeserializeObject<List<HotelsDTO>>(Convert.ToString(response.Result)).Select(u => new SelectListItem
+                {
+                    Text = u.Name,
+                    Value = u.Id.ToString()
+                });
+
             }
             return NotFound();
         }
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Delete(HotelNoDTO hotelsNoDTO)
+        public async Task<IActionResult> Delete(HotelNoDeleteVM hotelNoDeleteVM)
         {
             if (ModelState.IsValid)
             {
-                var response = await _IHotelNo.DeleteAsync<APIResponse>(hotelsNoDTO.HotelNumber);
+                var response = await _IHotelNo.DeleteAsync<APIResponse>(hotelNoDeleteVM.hotelNoDTO.HotelNumber);
                 if (response != null && response.IsSuccess)
                 {
                     return RedirectToAction(nameof(Index));
 
                 }
             }
-            return View(hotelsNoDTO);
+            return View(hotelNoDeleteVM);
         }
     }
 }

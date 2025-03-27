@@ -137,25 +137,33 @@ namespace Book_Your_Hotel.Controller
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<ActionResult<APIResponse>> UpdateHotelNumber(int id, [FromBody] HotelNoUpdateDTO toUpdateNoDTO)
         {
-            if (id == 0 || toUpdateNoDTO.HotelNumber == 0)
+            try
             {
-                response.HttpStatusCode = HttpStatusCode.BadRequest;
-                response.IsSuccess = false;
-                response.Errors = new List<string> { "Invalid hotel Number ID or update data" };
-                return BadRequest(response);
+                if (id != toUpdateNoDTO.HotelNumber || toUpdateNoDTO == null)
+                {
+                    response.HttpStatusCode = HttpStatusCode.BadRequest;
+                    response.IsSuccess = false;
+                    response.Errors = new List<string> { "Invalid hotel Number ID or update data" };
+                    return BadRequest(response);
+                }
+                if (await _IHotel.GetAsync(u => u.Id == toUpdateNoDTO.HotelID) == null)
+                {
+                    ModelState.AddModelError("ErrorMessages", "Hotel ID is Invalid!");
+                    return BadRequest(ModelState);
+                }
+             
+              var model =   _IMapper.Map<HotelNumbers>(toUpdateNoDTO);
+                await _IHotelNo.UpdateAsync(model);
+                response.IsSuccess = true;
+                return Ok(response);
             }
-            var existingHotelNo = await _IHotelNo.GetAsync(u => u.HotelNumber == id, tracked: true);
-            if (existingHotelNo == null)
+             catch (Exception ex)
             {
-                response.HttpStatusCode = HttpStatusCode.NotFound;
                 response.IsSuccess = false;
-                response.Errors = new List<string> { "Hotel number not found for update" };
-                return NotFound(response);
+                response.Errors
+                     = new List<string>() { ex.ToString() };
             }
-            _IMapper.Map(toUpdateNoDTO, existingHotelNo);
-            await _IHotelNo.UpdateAsync(existingHotelNo);
-            response.IsSuccess = true;
-            return Ok(response);
+            return response;
         }
 
         [HttpDelete("{id:int}")]
@@ -164,26 +172,29 @@ namespace Book_Your_Hotel.Controller
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<ActionResult<APIResponse>> DeleteHotelNumber(int id)
         {
-            if (id == 0)
-            {
-                response.HttpStatusCode = HttpStatusCode.BadRequest;
-                response.IsSuccess = false;
-                response.Errors = new List<string> { "Invalid hotel ID" };
-                return BadRequest(response);
-            }
-            var HotelNo = await _IHotelNo.GetAsync(u=>u.HotelNumber == id);
-            if (HotelNo == null)
-            {
-                response.HttpStatusCode = HttpStatusCode.NotFound;
-                response.IsSuccess = false;
-                response.Errors = new List<string> { "Hotel Number not found" };
-                return NotFound(response);
-            }
-            await _IHotelNo.RemoveAsync(HotelNo);
-            response.HttpStatusCode = HttpStatusCode.NoContent;
-            response.IsSuccess = true;
+            
+                if (id == 0)
+                {
+                    response.HttpStatusCode = HttpStatusCode.BadRequest;
+                    response.IsSuccess = false;
+                    response.Errors = new List<string> { "Invalid hotel ID" };
+                    return BadRequest(response);
+                }
+                var HotelNo = await _IHotelNo.GetAsync(u => u.HotelNumber == id);
+                if (HotelNo == null)
+                {
+                    response.HttpStatusCode = HttpStatusCode.NotFound;
+                    response.IsSuccess = false;
+                    response.Errors = new List<string> { "Hotel Number not found" };
+                    return NotFound(response);
+                }
+                await _IHotelNo.RemoveAsync(HotelNo);
+                response.HttpStatusCode = HttpStatusCode.NoContent;
+                response.IsSuccess = true;
 
-            return Ok(response);
+                return Ok(response);
+            
+           
         }
     }
     }
