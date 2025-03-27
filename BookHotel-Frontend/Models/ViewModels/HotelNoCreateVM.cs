@@ -1,7 +1,9 @@
-﻿using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
+﻿
+using BookHotel_Frontend.Models.DTOs;
+using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
 using Microsoft.AspNetCore.Mvc.Rendering;
 
-namespace BookHotel_Frontend.Models.DTOs.ViewModels
+namespace BookHotel_Frontend.Models.ViewModels
 {
     public class HotelNoCreateVM
     {

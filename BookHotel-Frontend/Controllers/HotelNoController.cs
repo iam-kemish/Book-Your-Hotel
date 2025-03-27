@@ -2,7 +2,7 @@
 
 using BookHotel_Frontend.Models;
 using BookHotel_Frontend.Models.DTOs;
-using BookHotel_Frontend.Models.DTOs.ViewModels;
+using BookHotel_Frontend.Models.ViewModels;
 using BookHotel_Frontend.Services.IServices;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -60,9 +60,29 @@ namespace BookHotel_Frontend.Controllers
                 {
                     return RedirectToAction(nameof(Index));
 
-                }
+                } else
+                {
+                    if (response.Errors.Count > 0)
+                    {
+                        ModelState.AddModelError("Error", "Invalid id, seems you have tried to manipulate already exisiting data. Please recheck");
+                    }
+            }
+            }
+
+            
+            var res = await _IHotelService.GetAllAsync<APIResponse>();
+            if (res != null && res.IsSuccess)
+            {
+                hotelNoCreateVM.HotelLists = JsonConvert.DeserializeObject<List<HotelsDTO>>(Convert.ToString(res.Result)).Select(u => new SelectListItem
+                {
+                    Text = u.Name,
+                    Value = u.Id.ToString()
+                });
+
             }
             return View(hotelNoCreateVM);
+
+          
         }
 
         public async Task<IActionResult> Update(int HotelNoId)

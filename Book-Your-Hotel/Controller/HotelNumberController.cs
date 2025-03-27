@@ -1,5 +1,6 @@
 ﻿using System.Net;
 using AutoMapper;
+using Azure;
 using Book_Your_Hotel.Models;
 using Book_Your_Hotel.Models.DTOs;
 using Book_Your_Hotel.Repositary.IRepositary;
@@ -78,34 +79,55 @@ namespace Book_Your_Hotel.Controller
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<ActionResult<APIResponse>> CreateHotelNumber([FromBody] HotelNoCreateDTO newHotelNumber)
         {
-            if (newHotelNumber == null)
+            try
             {
-                response.HttpStatusCode = HttpStatusCode.BadRequest;
-                response.IsSuccess = false;
-                response.Errors = new List<string> { "Hotel number data is null" };
-                return BadRequest(response);
+                if (newHotelNumber == null)
+                {
+                    response.HttpStatusCode = HttpStatusCode.BadRequest;
+                    response.IsSuccess = false;
+                    response.Errors = new List<string> { "Invalid inserted data." };
+                    return BadRequest(response);
+                }
+                if (await _IHotelNo.GetAsync(u => u.HotelNumber == newHotelNumber.HotelNumber) != null)
+                {
+                    ModelState.AddModelError("Errors", "Hotel data already exists.");
+
+                    response.HttpStatusCode = HttpStatusCode.BadRequest;
+                    response.IsSuccess = false;
+                    response.Errors = ModelState.Values.SelectMany(v => v.Errors)
+                                                       .Select(e => e.ErrorMessage)
+                                                       .ToList();
+
+                    return BadRequest(response);
+                }
+                if (await _IHotel.GetAsync(u => u.Id == newHotelNumber.HotelID) == null)
+                {
+                    ModelState.AddModelError("Errors", "Hotel id is invalid");
+
+                    response.HttpStatusCode = HttpStatusCode.BadRequest;
+                    response.IsSuccess = false;
+                    response.Errors = ModelState.Values.SelectMany(v => v.Errors)
+                                                       .Select(e => e.ErrorMessage)
+                                                       .ToList();
+
+                    return BadRequest(response);
+                }
+                HotelNumbers hotelNumbers = _IMapper.Map<HotelNumbers>(newHotelNumber);
+                await _IHotelNo.CreateAsync(hotelNumbers);
+
+                response.Result = _IMapper.Map<HotelNoDTO>(hotelNumbers);
+                response.HttpStatusCode = HttpStatusCode.Created;
+                response.IsSuccess = true;
+
+                return CreatedAtAction(nameof(GetHotelNumber), new { id = hotelNumbers.HotelNumber }, response);
             }
-            if (await _IHotel.GetAsync(u => u.Id == newHotelNumber.HotelID) != null)
+            catch (Exception ex)
             {
-                ModelState.AddModelError("Errors", "Hotel id is invalid"); 
-
-                response.HttpStatusCode = HttpStatusCode.BadRequest;
                 response.IsSuccess = false;
-                response.Errors = ModelState.Values.SelectMany(v => v.Errors)
-                                                   .Select(e => e.ErrorMessage)
-                                                   .ToList();
-
-                return BadRequest(response);
+                response.Errors
+                     = new List<string>() { ex.ToString() };
             }
-
-            HotelNumbers hotelNumbers = _IMapper.Map<HotelNumbers>(newHotelNumber);
-            await _IHotelNo.CreateAsync(hotelNumbers);
-
-            response.Result = _IMapper.Map<HotelNoDTO>(hotelNumbers);
-            response.HttpStatusCode = HttpStatusCode.Created;
-            response.IsSuccess = true;
-
-            return CreatedAtAction(nameof(GetHotelNumber), new { id = hotelNumbers.HotelNumber }, response);
+            return response;
 
         }
 
