@@ -17,47 +17,54 @@ namespace BookHotel_Frontend.Controllers
             _IHotel = hotelService;
             _IMapper = mapper;
         }
-        public async Task<IActionResult>  Index()
+
+        public async Task<IActionResult> Index()
         {
             List<HotelsDTO> ResultedList = new();
             var response = await _IHotel.GetAllAsync<APIResponse>();
-            if (response != null && response.IsSuccess) {
+            if (response != null && response.IsSuccess)
+            {
                 ResultedList = JsonConvert.DeserializeObject<List<HotelsDTO>>(Convert.ToString(response.Result));
-            
             }
             return View(ResultedList);
         }
 
-        public async Task<IActionResult>  Create()
+        public async Task<IActionResult> Create()
         {
             return View();
         }
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(HotelCreateDTO hotelCreateDTO)
         {
             if (ModelState.IsValid)
             {
-              
                 var response = await _IHotel.CreateAsync<APIResponse>(hotelCreateDTO);
                 if (response != null && response.IsSuccess)
                 {
-                  return RedirectToAction(nameof(Index));
-
+                    TempData["success"] = "Hotel created successfully!";
+                    return RedirectToAction(nameof(Index));
+                }
+                else
+                {
+                    TempData["error"] = response.Errors.FirstOrDefault() ?? "Error occurred while creating hotel.";
                 }
             }
-                return View(hotelCreateDTO);
+            return View(hotelCreateDTO);
         }
+
         public async Task<IActionResult> Update(int hotelId)
         {
             var response = await _IHotel.GetAsync<APIResponse>(hotelId);
-            if(response != null && response.IsSuccess)
+            if (response != null && response.IsSuccess)
             {
                 HotelsDTO hotelsDTO = JsonConvert.DeserializeObject<HotelsDTO>(Convert.ToString(response.Result));
                 return View(_IMapper.Map<HotelUpdateDTO>(hotelsDTO));
             }
             return NotFound();
         }
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Update(HotelUpdateDTO hotelUpdateDTO)
@@ -65,13 +72,19 @@ namespace BookHotel_Frontend.Controllers
             if (ModelState.IsValid)
             {
                 var response = await _IHotel.UpdateAsync<APIResponse>(hotelUpdateDTO);
-                if(response != null && response.IsSuccess)
+                if (response != null && response.IsSuccess)
                 {
+                    TempData["success"] = "Hotel updated successfully!";
                     return RedirectToAction(nameof(Index));
+                }
+                else
+                {
+                    TempData["error"] = response.Errors.FirstOrDefault() ?? "Error occurred while updating hotel.";
                 }
             }
             return View(hotelUpdateDTO);
         }
+
         public async Task<IActionResult> Delete(int HotelId)
         {
             var response = await _IHotel.GetAsync<APIResponse>(HotelId);
@@ -82,17 +95,20 @@ namespace BookHotel_Frontend.Controllers
             }
             return NotFound();
         }
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Delete(HotelsDTO hotelsDTO)
         {
-          
-                var response = await _IHotel.DeleteAsync<APIResponse>(hotelsDTO.Id);
-                if (response != null && response.IsSuccess)
-                {
-                    return RedirectToAction(nameof(Index));
-
-                
+            var response = await _IHotel.DeleteAsync<APIResponse>(hotelsDTO.Id);
+            if (response != null && response.IsSuccess)
+            {
+                TempData["success"] = "Hotel deleted successfully!";
+                return RedirectToAction(nameof(Index));
+            }
+            else
+            {
+                TempData["error"] = response.Errors.FirstOrDefault() ?? "Error occurred while deleting hotel.";
             }
             return View(hotelsDTO);
         }

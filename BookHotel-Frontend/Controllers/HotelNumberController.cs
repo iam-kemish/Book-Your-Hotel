@@ -1,5 +1,4 @@
 ﻿using AutoMapper;
-
 using BookHotel_Frontend.Models;
 using BookHotel_Frontend.Models.DTOs;
 using BookHotel_Frontend.Models.ViewModels;
@@ -15,12 +14,14 @@ namespace BookHotel_Frontend.Controllers
         private readonly IHotelNumberService _IHotelNo;
         private readonly IMapper _IMapper;
         private readonly IHotelService _IHotelService;
+
         public HotelNumberController(IHotelNumberService hotelNoService, IMapper mapper, IHotelService IHotelService)
         {
             _IHotelNo = hotelNoService;
             _IMapper = mapper;
-           _IHotelService = IHotelService;
+            _IHotelService = IHotelService;
         }
+
         public async Task<IActionResult> Index()
         {
             List<HotelNoDTO> ResultedList = new();
@@ -28,10 +29,10 @@ namespace BookHotel_Frontend.Controllers
             if (response != null && response.IsSuccess)
             {
                 ResultedList = JsonConvert.DeserializeObject<List<HotelNoDTO>>(Convert.ToString(response.Result));
-
             }
             return View(ResultedList);
         }
+
         public async Task<IActionResult> Create()
         {
             HotelNoCreateVM hotelNoCreateVM = new HotelNoCreateVM();
@@ -43,33 +44,28 @@ namespace BookHotel_Frontend.Controllers
                     Text = u.Name,
                     Value = u.Id.ToString()
                 });
-
             }
-                return View(hotelNoCreateVM);
+            return View(hotelNoCreateVM);
         }
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(HotelNoCreateVM hotelNoCreateVM)
         {
-
             if (ModelState.IsValid)
             {
-
                 var response = await _IHotelNo.CreateAsync<APIResponse>(hotelNoCreateVM.HotelNoCreateDTO);
                 if (response != null && response.IsSuccess)
                 {
+                    TempData["success"] = "Hotel number created successfully!";
                     return RedirectToAction(nameof(Index));
-
-                } else
+                }
+                else
                 {
-                    if (response.Errors.Count > 0)
-                    {
-                        ModelState.AddModelError("Error", response.Errors.FirstOrDefault());
-                    }
-            }
+                    TempData["error"] = response.Errors.FirstOrDefault() ?? "Error occurred while creating hotel number.";
+                }
             }
 
-            
             var res = await _IHotelService.GetAllAsync<APIResponse>();
             if (res != null && res.IsSuccess)
             {
@@ -78,11 +74,8 @@ namespace BookHotel_Frontend.Controllers
                     Text = u.Name,
                     Value = u.Id.ToString()
                 });
-
             }
             return View(hotelNoCreateVM);
-
-          
         }
 
         public async Task<IActionResult> Update(int HotelNoId)
@@ -91,8 +84,8 @@ namespace BookHotel_Frontend.Controllers
             var response = await _IHotelNo.GetAsync<APIResponse>(HotelNoId);
             if (response != null && response.IsSuccess)
             {
-               HotelNoDTO hotelNoDto = JsonConvert.DeserializeObject<HotelNoDTO>(Convert.ToString(response.Result));
-             hotelNoUpdateVM.hotelNoUpdateDTO =   _IMapper.Map<HotelNoUpdateDTO>(hotelNoDto);
+                HotelNoDTO hotelNoDto = JsonConvert.DeserializeObject<HotelNoDTO>(Convert.ToString(response.Result));
+                hotelNoUpdateVM.hotelNoUpdateDTO = _IMapper.Map<HotelNoUpdateDTO>(hotelNoDto);
             }
             response = await _IHotelService.GetAllAsync<APIResponse>();
             if (response != null && response.IsSuccess)
@@ -102,48 +95,42 @@ namespace BookHotel_Frontend.Controllers
                     Text = u.Name,
                     Value = u.Id.ToString()
                 });
-
-            return View(hotelNoUpdateVM);
+                return View(hotelNoUpdateVM);
             }
             return NotFound();
         }
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Update(HotelNoUpdateVM hotelNoUpdateVM)
         {
             if (ModelState.IsValid)
             {
-
                 var response = await _IHotelNo.UpdateAsync<APIResponse>(hotelNoUpdateVM.hotelNoUpdateDTO);
                 if (response != null && response.IsSuccess)
                 {
+                    TempData["success"] = "Hotel number updated successfully!";
                     return RedirectToAction(nameof(Index));
-
                 }
                 else
                 {
-                    if (response.Errors.Count > 0)
-                    {
-                        ModelState.AddModelError("Error", response.Errors.FirstOrDefault());
-                    }
+                    TempData["error"] = response.Errors.FirstOrDefault() ?? "Error occurred while updating hotel number.";
                 }
             }
+
             var res = await _IHotelService.GetAllAsync<APIResponse>();
             if (res != null && res.IsSuccess)
             {
-               hotelNoUpdateVM.HotelLists = JsonConvert.DeserializeObject<List<HotelsDTO>>(Convert.ToString(res.Result)).Select(u => new SelectListItem
+                hotelNoUpdateVM.HotelLists = JsonConvert.DeserializeObject<List<HotelsDTO>>(Convert.ToString(res.Result)).Select(u => new SelectListItem
                 {
                     Text = u.Name,
                     Value = u.Id.ToString()
                 });
-
             }
-
-
             return View(hotelNoUpdateVM);
         }
-    
-     public async Task<IActionResult> Delete(int HotelNoId)
+
+        public async Task<IActionResult> Delete(int HotelNoId)
         {
             HotelNoDeleteVM hotelNoDeleteVM = new();
             var response = await _IHotelNo.GetAsync<APIResponse>(HotelNoId);
@@ -155,36 +142,30 @@ namespace BookHotel_Frontend.Controllers
             response = await _IHotelService.GetAllAsync<APIResponse>();
             if (response != null && response.IsSuccess)
             {
-               hotelNoDeleteVM.HotelLists = JsonConvert.DeserializeObject<List<HotelsDTO>>(Convert.ToString(response.Result)).Select(u => new SelectListItem
+                hotelNoDeleteVM.HotelLists = JsonConvert.DeserializeObject<List<HotelsDTO>>(Convert.ToString(response.Result)).Select(u => new SelectListItem
                 {
                     Text = u.Name,
                     Value = u.Id.ToString()
                 });
                 return View(hotelNoDeleteVM);
-
             }
             return NotFound();
         }
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Delete(HotelNoDeleteVM hotelNoDeleteVM)
         {
-            
-              var response = await _IHotelNo.DeleteAsync<APIResponse>(hotelNoDeleteVM.hotelNoDTO.HotelNumber);
+            var response = await _IHotelNo.DeleteAsync<APIResponse>(hotelNoDeleteVM.hotelNoDTO.HotelNumber);
             if (response != null && response.IsSuccess)
             {
+                TempData["success"] = "Hotel number deleted successfully!";
                 return RedirectToAction(nameof(Index));
-
             }
             else
             {
-                if (response.Errors.Count > 0)
-                {
-                    ModelState.AddModelError("Error", response.Errors.FirstOrDefault());
-                }
+                TempData["error"] = response.Errors.FirstOrDefault() ?? "Error occurred while deleting hotel number.";
             }
-
-
             return View(hotelNoDeleteVM);
         }
     }
