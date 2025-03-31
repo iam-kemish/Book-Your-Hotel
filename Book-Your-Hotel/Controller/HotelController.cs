@@ -1,5 +1,4 @@
 ﻿using AutoMapper;
-using Book_Your_Hotel.Database;
 using Book_Your_Hotel.Models;
 using Book_Your_Hotel.Models.DTOs;
 using Book_Your_Hotel.Repositary.IRepositary;

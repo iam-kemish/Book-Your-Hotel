@@ -7,6 +7,10 @@ namespace BookHotel_Frontend.Models.ViewModels
 {
     public class HotelNoDeleteVM
     {
+        public HotelNoDeleteVM()
+        {
+            hotelNoDTO = new HotelNoDTO();
+        }
         public HotelNoDTO hotelNoDTO { get; set; }
 
         [ValidateNever]

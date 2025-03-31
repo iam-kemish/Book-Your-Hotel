@@ -1,5 +1,4 @@
 ﻿using System.Text;
-using Book_Your_Hotel.Models;
 using BookHotel_Frontend.Models;
 using BookHotel_Frontend.Services.IServices;
 using Newtonsoft.Json;
@@ -25,11 +24,13 @@ namespace BookHotel_Frontend.Services
                 HttpRequestMessage httpRequestMessage = new HttpRequestMessage();
                 httpRequestMessage.Headers.Add("Accept", "application/json");
                 httpRequestMessage.RequestUri = new Uri(apiRequest.Url);
-                if(apiRequest.Data != null)
+
+                if (apiRequest.Data != null)
                 {
                     httpRequestMessage.Content = new StringContent(JsonConvert.SerializeObject(apiRequest.Data), Encoding.UTF8, "application/json");
-
                 }
+
+                // Set request method based on ApiType
                 switch (apiRequest.ApiType)
                 {
                     case ApiType.PUT:
@@ -45,23 +46,24 @@ namespace BookHotel_Frontend.Services
                         httpRequestMessage.Method = HttpMethod.Get;
                         break;
                 }
+
                 HttpResponseMessage httpResponseMessage = await client.SendAsync(httpRequestMessage);
                 var apiContent = await httpResponseMessage.Content.ReadAsStringAsync();
                 var ApiReturnedData = JsonConvert.DeserializeObject<T>(apiContent);
-                return ApiReturnedData;
 
+                return ApiReturnedData;
             }
             catch (Exception e)
             {
                 var dto = new APIResponse
                 {
-                    Errors = new List<string> { Convert.ToString(e.Message) },
+                    Errors = new List<string> { e.Message },
                     IsSuccess = false,
                 };
-            var res = JsonConvert.SerializeObject(dto);
-            var returnObj = JsonConvert.DeserializeObject<T>(res);
-            return returnObj;
+
+                return JsonConvert.DeserializeObject<T>(JsonConvert.SerializeObject(dto));
             }
         }
+
     }
 }

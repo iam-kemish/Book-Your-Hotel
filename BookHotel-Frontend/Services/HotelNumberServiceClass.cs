@@ -1,16 +1,15 @@
-﻿using Book_Your_Hotel.Models;
-using BookHotel_Frontend.Models;
+﻿using BookHotel_Frontend.Models;
 using BookHotel_Frontend.Models.DTOs;
 using BookHotel_Frontend.Services.IServices;
 using BookHotel_Utilities;
 
 namespace BookHotel_Frontend.Services
 {
-    public class HotelNoServiceClass : BaseServiceClass, IHotelNoService
+    public class HotelNumberServiceClass : BaseServiceClass, IHotelNumberService
     {
         private readonly IHttpClientFactory _httpClientFactory;
         private string HotelNoUrl;
-        public HotelNoServiceClass(IHttpClientFactory httpClientFactory, IConfiguration configuration) : base(httpClientFactory)
+        public HotelNumberServiceClass(IHttpClientFactory httpClientFactory, IConfiguration configuration) : base(httpClientFactory)
         {
             _httpClientFactory = httpClientFactory;
             HotelNoUrl = configuration.GetValue<string>("ServiceUrls:BookHotelApi");
@@ -24,7 +23,7 @@ namespace BookHotel_Frontend.Services
                 {
                     ApiType = StaticDetails.ApiType.POST,
                     Data = dto,
-                    Url = HotelNoUrl + "api/HotelNumbers"
+                    Url = HotelNoUrl + "api/HotelNumbers/"
                 }
 
                 );
@@ -36,7 +35,7 @@ namespace BookHotel_Frontend.Services
                 new ApiRequest
                 {
                     ApiType = StaticDetails.ApiType.DELETE,
-                    Url = HotelNoUrl + "api/HotelNumbers" + id,
+                    Url = HotelNoUrl + "api/HotelNumbers/" + id,
                 }
 
                 );
@@ -48,7 +47,7 @@ namespace BookHotel_Frontend.Services
                  new ApiRequest
                  {
                      ApiType = StaticDetails.ApiType.GET,                   
-                     Url = HotelNoUrl + "api/HotelNumbers"
+                     Url = HotelNoUrl + "api/HotelNumbers/"
                  }
 
                  );
@@ -60,18 +59,18 @@ namespace BookHotel_Frontend.Services
                 new ApiRequest
                 {
                     ApiType = StaticDetails.ApiType.GET,
-                    Url = HotelNoUrl + "api/HotelNumbers" + id,
+                    Url = HotelNoUrl + "api/HotelNumbers/" + id,
                 }
-
                 );
         }
 
         public Task<T> UpdateAsync<T>(HotelNoUpdateDTO dto)
         {
-            return SendAsync<T>(new ApiRequest { 
-                ApiType = StaticDetails.ApiType.GET, 
+            return SendAsync<T>(new ApiRequest 
+            { 
+                ApiType = StaticDetails.ApiType.PUT, 
                 Data = dto,
-                Url = HotelNoUrl + "api/HotelNumbers" + dto.HotelNumber
+                Url = HotelNoUrl + "api/HotelNumbers/" + dto.HotelNumber
             });
         }
     }

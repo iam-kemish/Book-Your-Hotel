@@ -1,0 +1,52 @@
+﻿@model HotelNoDeleteVM
+
+<form asp-action="Delete">
+    <br />
+    <div class="container border p-3">
+        <h1 class="text-primary">Delete Hotel Number</h1>
+        <hr />
+        <input asp-for="hotelNoDTO.HotelNumber" class="form-control" hidden />
+        <div class="row">
+            <div asp-validation-summary="All" class="text-danger"></div>
+
+            <div class="col-2">
+                <label asp-for="hotelNoDTO.HotelNumber" class="control-label pt-2" style="font-size:20px;" disabled></label>
+            </div>
+            <div class="col-10 pb-3">
+              
+                <input asp-for="hotelNoDTO.HotelNumber" class="form-control" disabled />
+                <span asp-validation-for="hotelNoDTO.HotelNumber" class="text-danger"></span>
+            </div>
+
+            <div class="col-2">
+                <label asp-for="hotelNoDTO.HotelID" class="control-label pt-2" style="font-size:20px;"></label>
+            </div>
+            <div class="col-10 pb-3">
+          
+                <select asp-for="hotelNoDTO.HotelID" class="form-select" asp-items="@Model.HotelLists" disabled>
+                    <option disabled selected>--Select Hotel--</option>
+                </select>
+                <span asp-validation-for="hotelNoDTO.HotelID" class="text-danger"></span>
+            </div>
+            <div class="col-2">
+                <label asp-for="hotelNoDTO.SpecialDetails" class="control-label pt-2" style="font-size:20px;"></label>
+            </div>
+            <div class="col-10 pb-3">
+               
+                <textarea asp-for="hotelNoDTO.SpecialDetails" class="form-control" rows="5" disabled></textarea>
+                <span asp-validation-for="hotelNoDTO.SpecialDetails" class="text-danger"></span>
+            </div>
+
+            <div class="col-5 offset-2">
+                <a asp-action="Index" asp-controller="HotelNumber" class="btn-primary btn form-control ">Back to List</a>
+            </div>
+            <div class="col-5">
+                <input type="submit" value="Delete" class="btn btn-danger form-control" />
+            </div>
+        </div>
+    </div>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

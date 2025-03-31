@@ -2,7 +2,7 @@
 
 namespace BookHotel_Frontend.Services.IServices
 {
-    public interface IHotelNoService
+    public interface IHotelNumberService
     {
         Task<T> GetAllAsync<T>();
         Task<T> GetAsync<T>(int id);

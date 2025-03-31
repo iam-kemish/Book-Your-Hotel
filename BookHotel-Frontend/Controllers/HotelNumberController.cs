@@ -10,12 +10,12 @@ using Newtonsoft.Json;
 
 namespace BookHotel_Frontend.Controllers
 {
-    public class HotelNoController : Controller
+    public class HotelNumberController : Controller
     {
-        private readonly IHotelNoService _IHotelNo;
+        private readonly IHotelNumberService _IHotelNo;
         private readonly IMapper _IMapper;
         private readonly IHotelService _IHotelService;
-        public HotelNoController(IHotelNoService hotelNoService, IMapper mapper, IHotelService IHotelService)
+        public HotelNumberController(IHotelNumberService hotelNoService, IMapper mapper, IHotelService IHotelService)
         {
             _IHotelNo = hotelNoService;
             _IMapper = mapper;
@@ -94,17 +94,18 @@ namespace BookHotel_Frontend.Controllers
                HotelNoDTO hotelNoDto = JsonConvert.DeserializeObject<HotelNoDTO>(Convert.ToString(response.Result));
              hotelNoUpdateVM.hotelNoUpdateDTO =   _IMapper.Map<HotelNoUpdateDTO>(hotelNoDto);
             }
-            var res = await _IHotelService.GetAllAsync<APIResponse>();
-            if (res != null && res.IsSuccess)
+            response = await _IHotelService.GetAllAsync<APIResponse>();
+            if (response != null && response.IsSuccess)
             {
-                hotelNoUpdateVM.HotelLists = JsonConvert.DeserializeObject<List<HotelsDTO>>(Convert.ToString(res.Result)).Select(u => new SelectListItem
+                hotelNoUpdateVM.HotelLists = JsonConvert.DeserializeObject<List<HotelsDTO>>(Convert.ToString(response.Result)).Select(u => new SelectListItem
                 {
                     Text = u.Name,
                     Value = u.Id.ToString()
                 });
 
-            }
             return View(hotelNoUpdateVM);
+            }
+            return NotFound();
         }
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -148,17 +149,18 @@ namespace BookHotel_Frontend.Controllers
             var response = await _IHotelNo.GetAsync<APIResponse>(HotelNoId);
             if (response != null && response.IsSuccess)
             {
-                HotelNoDTO HotelNoDto = JsonConvert.DeserializeObject<HotelNoDTO>(Convert.ToString(response.Result));
-                hotelNoDeleteVM.hotelNoDTO = _IMapper.Map<HotelNoDTO>(hotelNoDeleteVM.hotelNoDTO);
+                HotelNoDTO hotelNoDto = JsonConvert.DeserializeObject<HotelNoDTO>(Convert.ToString(response.Result));
+                hotelNoDeleteVM.hotelNoDTO = hotelNoDto;
             }
-            var res = await _IHotelService.GetAllAsync<APIResponse>();
-            if (res != null && res.IsSuccess)
+            response = await _IHotelService.GetAllAsync<APIResponse>();
+            if (response != null && response.IsSuccess)
             {
                hotelNoDeleteVM.HotelLists = JsonConvert.DeserializeObject<List<HotelsDTO>>(Convert.ToString(response.Result)).Select(u => new SelectListItem
                 {
                     Text = u.Name,
                     Value = u.Id.ToString()
                 });
+                return View(hotelNoDeleteVM);
 
             }
             return NotFound();
@@ -167,15 +169,22 @@ namespace BookHotel_Frontend.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Delete(HotelNoDeleteVM hotelNoDeleteVM)
         {
-            if (ModelState.IsValid)
+            
+              var response = await _IHotelNo.DeleteAsync<APIResponse>(hotelNoDeleteVM.hotelNoDTO.HotelNumber);
+            if (response != null && response.IsSuccess)
             {
-                var response = await _IHotelNo.DeleteAsync<APIResponse>(hotelNoDeleteVM.hotelNoDTO.HotelNumber);
-                if (response != null && response.IsSuccess)
-                {
-                    return RedirectToAction(nameof(Index));
+                return RedirectToAction(nameof(Index));
 
+            }
+            else
+            {
+                if (response.Errors.Count > 0)
+                {
+                    ModelState.AddModelError("Error", response.Errors.FirstOrDefault());
                 }
             }
+
+
             return View(hotelNoDeleteVM);
         }
     }

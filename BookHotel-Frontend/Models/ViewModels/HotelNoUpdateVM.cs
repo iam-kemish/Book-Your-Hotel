@@ -7,6 +7,10 @@ namespace BookHotel_Frontend.Models.ViewModels
 {
     public class HotelNoUpdateVM
     {
+        public HotelNoUpdateVM()
+        {
+            hotelNoUpdateDTO = new HotelNoUpdateDTO();
+        }
         public HotelNoUpdateDTO hotelNoUpdateDTO { get; set; }
 
         [ValidateNever]

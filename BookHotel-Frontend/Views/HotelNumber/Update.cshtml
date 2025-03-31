@@ -2,12 +2,12 @@
 
 <form asp-action="Update">
 
-    <input hidden asp-for="hotelNoUpdateDTO.HotelNumber"/>
+  
     <br />
     <div class="container border p-3">
-        <h1 class="text-primary">Update Hotel</h1>
+        <h1 class="text-primary">Update Hotel Number</h1>
         <hr />
-
+        <input asp-for="hotelNoUpdateDTO.HotelNumber" class="form-control" hidden />
         <div class="row">
             <div asp-validation-summary="All" class="text-danger"></div>
 
@@ -15,7 +15,7 @@
                 <label asp-for="hotelNoUpdateDTO.HotelNumber" class="control-label pt-2" style="font-size:20px;"></label>
             </div>
             <div class="col-10 pb-3">
-                <input asp-for="hotelNoUpdateDTO.HotelNumber" class="form-control" />
+                <input asp-for="hotelNoUpdateDTO.HotelNumber" class="form-control" disabled />
                 <span asp-validation-for="hotelNoUpdateDTO.HotelNumber" class="text-danger"></span>
             </div>
 
@@ -37,10 +37,10 @@
             </div>
 
             <div class="col-5 offset-2">
-                <a asp-action="Index" asp-controller="HotelNo" class="btn-primary btn form-control ">Back to List</a>
+                <a asp-action="Index" asp-controller="HotelNumber" class="btn-primary btn form-control ">Back to List</a>
             </div>
             <div class="col-5">
-                <input type="submit" value="Create" class="btn btn-success form-control" />
+                <input type="submit" value="Update" class="btn btn-primary form-control" />
             </div>
         </div>
     </div>
