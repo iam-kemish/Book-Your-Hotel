@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Book_Your_Hotel.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250327080513_SeededData")]
-    partial class SeededData
+    [Migration("20250403081605_UpdatedLocalUser")]
+    partial class UpdatedLocalUser
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -151,6 +151,35 @@ namespace Book_Your_Hotel.Migrations
                             Price = 1500,
                             UpdatedOn = new DateTime(2024, 1, 5, 17, 20, 0, 0, DateTimeKind.Unspecified)
                         });
+                });
+
+            modelBuilder.Entity("Book_Your_Hotel.Models.LocalUser", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Password")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Role")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("UserName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("LocalUsers");
                 });
 
             modelBuilder.Entity("Book_Your_Hotel.Models.HotelNumbers", b =>
