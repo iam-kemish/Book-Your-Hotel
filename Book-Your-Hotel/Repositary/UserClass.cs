@@ -1,6 +1,7 @@
 ﻿using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using AutoMapper;
 using Book_Your_Hotel.Database;
 using Book_Your_Hotel.Models;
 using Book_Your_Hotel.Models.DTOs;
@@ -9,22 +10,29 @@ using Microsoft.IdentityModel.Tokens;
 
 namespace Book_Your_Hotel.Repositary
 {
-    public class UserRepositary : IUser
+    public class UserClass : IUser
     {
         private readonly ApplicationDbContext _Db;
         private string SecretKey;
-        public UserRepositary(ApplicationDbContext applicationDbContext, IConfiguration configuration)
+        private readonly IMapper _Imapper;
+        public UserClass(ApplicationDbContext applicationDbContext, IConfiguration configuration, IMapper mapper)
         {
             _Db = applicationDbContext;
             SecretKey = configuration.GetValue<string>("JwtSettings:SecretKey");
+            _Imapper = mapper;
         }
 
         public bool IsUniqueUser(string user)
         {
-            throw new NotImplementedException();
+            var checkUser = _Db.LocalUsers.FirstOrDefault(u=>u.UserName ==  user);
+            if (checkUser == null) {
+                return true;
+            }
+            return false;
+
         }
 
-        public Task<LoginResponseDTO> Login(LoginRequestDTO request)
+        public async Task<LoginResponseDTO> Login(LoginRequestDTO request)
         {
             var user = _Db.LocalUsers.FirstOrDefault(u => u.UserName.ToLower() == request.UserName.ToLower() && u.Password == request.Password);
             if (user == null)
@@ -50,12 +58,16 @@ namespace Book_Your_Hotel.Repositary
                 Token = tokenHandler.WriteToken(ResultedToken),
                 User = user
             };
-            return Task.FromResult(dto);
+            return dto;
         }
 
-        public Task<LocalUser> Register(LocalUser user)
+        public async Task<LocalUser> Register(RegisterationRequestDTO registerationRequestDTO)
         {
-            throw new NotImplementedException();
+            var newUser = _Imapper.Map<LocalUser>(registerationRequestDTO);
+            _Db.LocalUsers.Add(newUser);
+           await  _Db.SaveChangesAsync();
+            newUser.Password = "";
+            return newUser;
         }
     }
 }

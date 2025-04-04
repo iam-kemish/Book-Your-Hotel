@@ -1,5 +1,6 @@
 using Book_Your_Hotel.Database;
 using Book_Your_Hotel.Mapper;
+using Book_Your_Hotel.Models;
 using Book_Your_Hotel.Repositary;
 using Book_Your_Hotel.Repositary.IRepositary;
 using Microsoft.EntityFrameworkCore;
@@ -14,6 +15,7 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 });
 builder.Services.AddScoped<IHotelRepo, HotelCLass>();
 builder.Services.AddScoped<IHotelNoRepo, HotelNoClass>();
+builder.Services.AddScoped<IUser, UserClass>();
 builder.Services.AddAutoMapper(typeof(MappingConfig));
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
