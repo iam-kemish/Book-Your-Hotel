@@ -11,7 +11,7 @@ builder.Services.AddControllersWithViews();
 builder.Services.AddAutoMapper(typeof(MappingConfig));
 builder.Services.AddHttpClient<IHotelService, HotelServiceClass>();
 builder.Services.AddScoped<IHotelService,HotelServiceClass>();
-
+builder.Services.AddScoped<IAuthService, AuthServiceClass>();
 builder.Services.AddHttpClient<IHotelNumberService, HotelNumberServiceClass>();
 builder.Services.AddScoped<IHotelNumberService, HotelNumberServiceClass>();
 var app = builder.Build();
