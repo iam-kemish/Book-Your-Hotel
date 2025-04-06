@@ -13,6 +13,7 @@ namespace BookHotel_Frontend.Controllers
         {
             _IAuth = authService;
         }
+        [HttpGet]
         public IActionResult Login()
         {
             return View();
