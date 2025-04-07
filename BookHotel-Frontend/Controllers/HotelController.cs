@@ -2,6 +2,7 @@
 using BookHotel_Frontend.Models;
 using BookHotel_Frontend.Models.DTOs;
 using BookHotel_Frontend.Services.IServices;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 
@@ -28,12 +29,12 @@ namespace BookHotel_Frontend.Controllers
             }
             return View(ResultedList);
         }
-
+        
         public async Task<IActionResult> Create()
         {
             return View();
         }
-
+        [Authorize(Roles ="Admin")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(HotelCreateDTO hotelCreateDTO)
@@ -64,7 +65,7 @@ namespace BookHotel_Frontend.Controllers
             }
             return NotFound();
         }
-
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Update(HotelUpdateDTO hotelUpdateDTO)
@@ -95,7 +96,7 @@ namespace BookHotel_Frontend.Controllers
             }
             return NotFound();
         }
-
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Delete(HotelsDTO hotelsDTO)

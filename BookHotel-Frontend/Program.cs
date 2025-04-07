@@ -14,6 +14,7 @@ builder.Services.AddScoped<IHotelService,HotelServiceClass>();
 builder.Services.AddScoped<IAuthService, AuthServiceClass>();
 builder.Services.AddHttpClient<IHotelNumberService, HotelNumberServiceClass>();
 builder.Services.AddScoped<IHotelNumberService, HotelNumberServiceClass>();
+builder.Services.AddDistributedMemoryCache();
 builder.Services.AddSession(options =>
 {
     options.IdleTimeout = TimeSpan.FromMinutes(100);
@@ -34,8 +35,9 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 app.UseRouting();
-app.UseSession();
+app.UseAuthentication();
 app.UseAuthorization();
+app.UseSession();
 
 app.MapControllerRoute(
     name: "default",

@@ -1,4 +1,5 @@
-﻿using BookHotel_Frontend.Models;
+﻿using Azure;
+using BookHotel_Frontend.Models;
 using BookHotel_Frontend.Models.DTOs;
 using BookHotel_Frontend.Services.IServices;
 using Microsoft.AspNetCore.Authentication;
@@ -28,13 +29,15 @@ namespace BookHotel_Frontend.Controllers
             APIResponse aPIResponse = await _IAuth.LoginAsync<APIResponse>(loginRequestDTO);
             if(aPIResponse != null && aPIResponse.IsSuccess)
             {
-                var model = JsonConvert.DeserializeObject<LoginResponseDTO>(Convert.ToString(aPIResponse.Result));
+                LoginResponseDTO model = JsonConvert.DeserializeObject<LoginResponseDTO>(Convert.ToString(aPIResponse.Result));
                 HttpContext.Session.SetString("JWTToken", model.Token);
                 return RedirectToAction("Index", "Home");
             }
             else
             {
-                ModelState.AddModelError("ErrorMessage", aPIResponse.Errors.FirstOrDefault());
+                //TempData["error"] = aPIResponse?.Errors.FirstOrDefault() ?? "Error occurred while creating hotel.";
+                ModelState.AddModelError("Errors", aPIResponse?.Errors?.FirstOrDefault() ?? "Invalid login attempt.");
+
                 return View(loginRequestDTO);
             }
         }
