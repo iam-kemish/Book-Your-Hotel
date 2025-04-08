@@ -25,7 +25,7 @@ namespace Book_Your_Hotel.Controller
         }
 
         [HttpGet]
-        [Authorize]
+    
         [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<ActionResult<APIResponse>> GetAllHotels()
         {
@@ -46,12 +46,13 @@ namespace Book_Your_Hotel.Controller
             }
             return Ok(response);
         }
-
+        [Authorize(Roles ="Admin")]
         [HttpGet("{id:int}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
         public async Task<ActionResult<APIResponse>> GetHotel(int id)
         {
             
@@ -81,6 +82,7 @@ namespace Book_Your_Hotel.Controller
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
         public async Task<ActionResult<APIResponse>> CreateHotel([FromBody] HotelCreateDTO newHotel)
         {
             
@@ -109,11 +111,12 @@ namespace Book_Your_Hotel.Controller
 
             return CreatedAtAction(nameof(GetHotel), new { id = hotels.Id }, response);
         }
-
+        [Authorize(Roles = "Admin")]
         [HttpDelete("{id:int}")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
         public async Task<ActionResult<APIResponse>> DeleteHotel(int id)
         {
             
@@ -140,11 +143,12 @@ namespace Book_Your_Hotel.Controller
 
             return Ok(response);
         }
-
+        [Authorize(Roles ="Custom")]
         [HttpPut("{id:int}", Name = "UpdateHotel")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
         public async Task<ActionResult<APIResponse>> UpdateHotel(int id, [FromBody] HotelUpdateDTO toUpdateDTO)
         {
             

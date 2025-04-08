@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System.Net.Http.Headers;
+using System.Text;
 using BookHotel_Frontend.Models;
 using BookHotel_Frontend.Services.IServices;
 using Newtonsoft.Json;
@@ -46,7 +47,10 @@ namespace BookHotel_Frontend.Services
                         httpRequestMessage.Method = HttpMethod.Get;
                         break;
                 }
-
+                if (string.IsNullOrEmpty(apiRequest.token))
+                {
+                    client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", apiRequest.token);
+                }
                 HttpResponseMessage httpResponseMessage = await client.SendAsync(httpRequestMessage);
                 var apiContent = await httpResponseMessage.Content.ReadAsStringAsync();
                 var ApiReturnedData = JsonConvert.DeserializeObject<T>(apiContent);

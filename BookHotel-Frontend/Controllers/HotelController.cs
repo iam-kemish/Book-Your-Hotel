@@ -18,11 +18,11 @@ namespace BookHotel_Frontend.Controllers
             _IHotel = hotelService;
             _IMapper = mapper;
         }
-
+        [Authorize]
         public async Task<IActionResult> Index()
         {
             List<HotelsDTO> ResultedList = new();
-            var response = await _IHotel.GetAllAsync<APIResponse>();
+            var response = await _IHotel.GetAllAsync<APIResponse>(HttpContext.Session.GetString("JWTToken"));
             if (response != null && response.IsSuccess)
             {
                 ResultedList = JsonConvert.DeserializeObject<List<HotelsDTO>>(Convert.ToString(response.Result));
@@ -30,7 +30,7 @@ namespace BookHotel_Frontend.Controllers
             return View(ResultedList);
         }
         
-        public async Task<IActionResult> Create()
+        public  IActionResult Create()
         {
             return View();
         }
@@ -41,7 +41,7 @@ namespace BookHotel_Frontend.Controllers
         {
             if (ModelState.IsValid)
             {
-                var response = await _IHotel.CreateAsync<APIResponse>(hotelCreateDTO);
+                var response = await _IHotel.CreateAsync<APIResponse>(hotelCreateDTO, HttpContext.Session.GetString("JWTToken"));
                 if (response != null && response.IsSuccess)
                 {
                     TempData["success"] = "Hotel created successfully!";
@@ -57,7 +57,7 @@ namespace BookHotel_Frontend.Controllers
 
         public async Task<IActionResult> Update(int hotelId)
         {
-            var response = await _IHotel.GetAsync<APIResponse>(hotelId);
+            var response = await _IHotel.GetAsync<APIResponse>(hotelId, HttpContext.Session.GetString("JWTToken"));
             if (response != null && response.IsSuccess)
             {
                 HotelsDTO hotelsDTO = JsonConvert.DeserializeObject<HotelsDTO>(Convert.ToString(response.Result));
@@ -72,7 +72,7 @@ namespace BookHotel_Frontend.Controllers
         {
             if (ModelState.IsValid)
             {
-                var response = await _IHotel.UpdateAsync<APIResponse>(hotelUpdateDTO);
+                var response = await _IHotel.UpdateAsync<APIResponse>(hotelUpdateDTO, HttpContext.Session.GetString("JWTToken"));
                 if (response != null && response.IsSuccess)
                 {
                     TempData["success"] = "Hotel updated successfully!";
@@ -88,7 +88,7 @@ namespace BookHotel_Frontend.Controllers
 
         public async Task<IActionResult> Delete(int HotelId)
         {
-            var response = await _IHotel.GetAsync<APIResponse>(HotelId);
+            var response = await _IHotel.GetAsync<APIResponse>(HotelId, HttpContext.Session.GetString("JWTToken"));
             if (response != null && response.IsSuccess)
             {
                 HotelsDTO hotelsDTO = JsonConvert.DeserializeObject<HotelsDTO>(Convert.ToString(response.Result));
@@ -101,7 +101,7 @@ namespace BookHotel_Frontend.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Delete(HotelsDTO hotelsDTO)
         {
-            var response = await _IHotel.DeleteAsync<APIResponse>(hotelsDTO.Id);
+            var response = await _IHotel.DeleteAsync<APIResponse>(hotelsDTO.Id, HttpContext.Session.GetString("JWTToken"));
             if (response != null && response.IsSuccess)
             {
                 TempData["success"] = "Hotel deleted successfully!";

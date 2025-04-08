@@ -63,11 +63,23 @@ namespace Book_Your_Hotel.Repositary
 
         public async Task<LocalUser> Register(RegisterationRequestDTO registerationRequestDTO)
         {
-            var newUser = _Imapper.Map<LocalUser>(registerationRequestDTO);
-            _Db.LocalUsers.Add(newUser);
-           await  _Db.SaveChangesAsync();
-            newUser.Password = "";
-            return newUser;
+            // var newUser = _Imapper.Map<LocalUser>(registerationRequestDTO);
+            // _Db.LocalUsers.Add(newUser);
+            //await  _Db.SaveChangesAsync();
+            // newUser.Password = "";
+            // return newUser;
+            LocalUser user = new()
+            {
+                UserName = registerationRequestDTO.UserName,
+                Password = registerationRequestDTO.Password,
+                Name = registerationRequestDTO.Name,
+                Role = registerationRequestDTO.Role
+            };
+
+            _Db.LocalUsers.Add(user);
+            await _Db.SaveChangesAsync();
+            user.Password = "";
+            return user;
         }
     }
 }

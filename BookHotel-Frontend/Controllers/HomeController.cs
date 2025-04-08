@@ -3,6 +3,7 @@ using AutoMapper;
 using BookHotel_Frontend.Models;
 using BookHotel_Frontend.Models.DTOs;
 using BookHotel_Frontend.Services.IServices;
+using BookHotel_Utilities;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 
@@ -21,7 +22,7 @@ namespace BookHotel_Frontend.Controllers
         public async Task<IActionResult> Index()
         {
             List<HotelsDTO> ResultedList = new();
-            var response = await _IHotel.GetAllAsync<APIResponse>();
+            var response = await _IHotel.GetAllAsync<APIResponse>(HttpContext.Session.GetString("JWTToken"));
             if (response != null && response.IsSuccess)
             {
                 ResultedList = JsonConvert.DeserializeObject<List<HotelsDTO>>(Convert.ToString(response.Result));

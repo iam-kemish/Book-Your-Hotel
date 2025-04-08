@@ -15,50 +15,55 @@ namespace BookHotel_Frontend.Services
             HotelUrl = configuration.GetValue<string>("ServiceUrls:BookHotelApi");
         }
 
-        public Task<T> CreateAsync<T>(HotelCreateDTO dto)
+        public Task<T> CreateAsync<T>(HotelCreateDTO dto, string Token)
         {
             return SendAsync<T>(new ApiRequest
             {
                 ApiType = StaticDetails.ApiType.POST,
                 Data = dto,
-                Url = HotelUrl+ "api/HotelLists"
+                Url = HotelUrl+ "api/HotelLists",
+                token = Token
             });
         }
 
-        public Task<T> DeleteAsync<T>(int id)
+        public Task<T> DeleteAsync<T>(int id, string Token)
         {
             return SendAsync<T>(new ApiRequest
             {
                 ApiType = StaticDetails.ApiType.DELETE,
-                Url = HotelUrl + "api/HotelLists/" + id
+                Url = HotelUrl + "api/HotelLists/" + id,
+                token = Token
             });
         }
 
-        public Task<T> GetAllAsync<T>()
+        public Task<T> GetAllAsync<T>(string Token)
         {
             return SendAsync<T>(new ApiRequest
             {
                 ApiType = StaticDetails.ApiType.GET,
-                Url = HotelUrl + "api/HotelLists/"
+                Url = HotelUrl + "api/HotelLists/",
+                token = Token
             });
         }
 
-        public Task<T> GetAsync<T>(int id)
+        public Task<T> GetAsync<T>(int id, string Token)
         {
             return SendAsync<T>(new ApiRequest
             {
                 ApiType = StaticDetails.ApiType.GET,
-                Url = HotelUrl + "api/HotelLists/" + id
+                Url = HotelUrl + "api/HotelLists/" + id,
+                token = Token
             });
         }
 
-        public Task<T> UpdateAsync<T>(HotelUpdateDTO dto)
+        public Task<T> UpdateAsync<T>(HotelUpdateDTO dto, string Token)
         {
             return SendAsync<T>(new ApiRequest
             {
                 ApiType = StaticDetails.ApiType.PUT,
                 Data = dto,
-                Url = HotelUrl + "api/HotelLists/" + dto.Id
+                Url = HotelUrl + "api/HotelLists/" + dto.Id,
+                token = Token
             });
         }
     }

@@ -16,61 +16,66 @@ namespace BookHotel_Frontend.Services
 
         }
 
-        public Task<T> CreateAsync<T>(HotelNoCreateDTO dto)
+        public Task<T> CreateAsync<T>(HotelNoCreateDTO dto, string Token)
         {
             return SendAsync<T>(
                 new ApiRequest
                 {
                     ApiType = StaticDetails.ApiType.POST,
                     Data = dto,
-                    Url = HotelNoUrl + "api/HotelNumbers/"
+                    Url = HotelNoUrl + "api/HotelNumbers/",
+                    token = Token
                 }
 
                 );
         }
 
-        public Task<T> DeleteAsync<T>(int id)
+        public Task<T> DeleteAsync<T>(int id, string Token)
         {
             return SendAsync<T>(
                 new ApiRequest
                 {
                     ApiType = StaticDetails.ApiType.DELETE,
                     Url = HotelNoUrl + "api/HotelNumbers/" + id,
+                    token = Token
                 }
 
                 );
         }
 
-        public Task<T> GetAllAsync<T>()
+        public Task<T> GetAllAsync<T>(string Token)
         {
             return SendAsync<T>(
                  new ApiRequest
                  {
                      ApiType = StaticDetails.ApiType.GET,                   
-                     Url = HotelNoUrl + "api/HotelNumbers/"
+                     Url = HotelNoUrl + "api/HotelNumbers/",
+                     token = Token
                  }
 
                  );
         }
 
-        public Task<T> GetAsync<T>(int id)
+        public Task<T> GetAsync<T>(int id, string Token)
         {
             return SendAsync<T>(
                 new ApiRequest
                 {
                     ApiType = StaticDetails.ApiType.GET,
                     Url = HotelNoUrl + "api/HotelNumbers/" + id,
+                    token = Token
                 }
                 );
         }
 
-        public Task<T> UpdateAsync<T>(HotelNoUpdateDTO dto)
+        public Task<T> UpdateAsync<T>(HotelNoUpdateDTO dto, string Token)
         {
             return SendAsync<T>(new ApiRequest 
             { 
                 ApiType = StaticDetails.ApiType.PUT, 
                 Data = dto,
-                Url = HotelNoUrl + "api/HotelNumbers/" + dto.HotelNumber
+                Url = HotelNoUrl + "api/HotelNumbers/" + dto.HotelNumber,
+                token = Token
             });
         }
     }

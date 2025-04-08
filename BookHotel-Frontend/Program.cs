@@ -3,6 +3,7 @@
 using BookHotel_Frontend.Mapper;
 using BookHotel_Frontend.Services;
 using BookHotel_Frontend.Services.IServices;
+using Microsoft.AspNetCore.Authentication.Cookies;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -15,6 +16,15 @@ builder.Services.AddScoped<IAuthService, AuthServiceClass>();
 builder.Services.AddHttpClient<IHotelNumberService, HotelNumberServiceClass>();
 builder.Services.AddScoped<IHotelNumberService, HotelNumberServiceClass>();
 builder.Services.AddDistributedMemoryCache();
+builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+               .AddCookie(options =>
+               {
+                   options.Cookie.HttpOnly = true;
+                   options.ExpireTimeSpan = TimeSpan.FromMinutes(30);
+                   options.LoginPath = "/Auth/Login";
+                   options.AccessDeniedPath = "/Auth/AccessDenied";
+                   options.SlidingExpiration = true;
+               });
 builder.Services.AddSession(options =>
 {
     options.IdleTimeout = TimeSpan.FromMinutes(100);

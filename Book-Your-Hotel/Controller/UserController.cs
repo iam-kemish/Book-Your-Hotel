@@ -21,7 +21,7 @@ namespace Book_Your_Hotel.Controller
         public async Task<ActionResult<APIResponse>> Login([FromBody] LoginRequestDTO loginRequest)
         {
             var LoginResult = await _IUser.Login(loginRequest);
-            if (LoginResult.User == null || string.IsNullOrEmpty(LoginResult.Token))
+            if (LoginResult == null || string.IsNullOrEmpty(LoginResult.Token))
             {
                 _ApiResponse.HttpStatusCode = System.Net.HttpStatusCode.BadRequest;
                 _ApiResponse.IsSuccess = false;
@@ -44,8 +44,15 @@ namespace Book_Your_Hotel.Controller
                 return BadRequest(_ApiResponse);
             }
             var registeredUser = await _IUser.Register(registerationRequest);
+            if (registeredUser == null) {
+                _ApiResponse.HttpStatusCode = System.Net.HttpStatusCode.BadRequest;
+                _ApiResponse.IsSuccess = false;
+                _ApiResponse.Errors.Add("Error while registering.");
+                return BadRequest(_ApiResponse);
+
+            }
             _ApiResponse.HttpStatusCode = System.Net.HttpStatusCode.OK;
-            _ApiResponse.Result = registeredUser;
+          
             return Ok(_ApiResponse);
 
         }
