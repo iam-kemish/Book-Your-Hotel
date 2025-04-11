@@ -9,6 +9,7 @@
         <input type="hidden" asp-for="Id" />
 
         <div class="row">
+            <div asp-validation-summary="All" class="text-danger"></div>
             <div class="col-2">
                 <label asp-for="Name" class="control-label pt-2" style="font-size:20px;">Hotel Name</label>
             </div>
@@ -52,7 +53,7 @@
             </div>
 
             <div class="col-5 offset-2">
-                <a asp-action="IndexHotel" asp-controller="Hotel" class="btn btn-primary form-control">Back to List</a>
+                <a asp-action="Index" asp-controller="Hotel" class="btn btn-primary form-control">Back to List</a>
             </div>
             <div class="col-5">
                 <input type="submit" value="Delete" class="btn btn-danger form-control" />

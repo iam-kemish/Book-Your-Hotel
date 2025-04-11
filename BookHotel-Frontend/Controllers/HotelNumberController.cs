@@ -3,6 +3,7 @@ using BookHotel_Frontend.Models;
 using BookHotel_Frontend.Models.DTOs;
 using BookHotel_Frontend.Models.ViewModels;
 using BookHotel_Frontend.Services.IServices;
+using BookHotel_Utilities;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Newtonsoft.Json;
@@ -25,7 +26,7 @@ namespace BookHotel_Frontend.Controllers
         public async Task<IActionResult> Index()
         {
             List<HotelNoDTO> ResultedList = new();
-            var response = await _IHotelNo.GetAllAsync<APIResponse>(HttpContext.Session.GetString("JWTToken"));
+            var response = await _IHotelNo.GetAllAsync<APIResponse>(HttpContext.Session.GetString(StaticDetails.SessionToken));
             if (response != null && response.IsSuccess)
             {
                 ResultedList = JsonConvert.DeserializeObject<List<HotelNoDTO>>(Convert.ToString(response.Result));
@@ -35,8 +36,8 @@ namespace BookHotel_Frontend.Controllers
 
         public async Task<IActionResult> Create()
         {
-            HotelNoCreateVM hotelNoCreateVM = new HotelNoCreateVM();
-            var response = await _IHotelService.GetAllAsync<APIResponse>(HttpContext.Session.GetString("JWTToken"));
+            HotelNoCreateVM hotelNoCreateVM = new();
+            var response = await _IHotelService.GetAllAsync<APIResponse>(HttpContext.Session.GetString(StaticDetails.SessionToken));
             if (response != null && response.IsSuccess)
             {
                 hotelNoCreateVM.HotelLists = JsonConvert.DeserializeObject<List<HotelsDTO>>(Convert.ToString(response.Result)).Select(u => new SelectListItem
@@ -54,7 +55,7 @@ namespace BookHotel_Frontend.Controllers
         {
             if (ModelState.IsValid)
             {
-                var response = await _IHotelNo.CreateAsync<APIResponse>(hotelNoCreateVM.HotelNoCreateDTO, HttpContext.Session.GetString("JWTToken"));
+                var response = await _IHotelNo.CreateAsync<APIResponse>(hotelNoCreateVM.HotelNoCreateDTO, HttpContext.Session.GetString(StaticDetails.SessionToken));
                 if (response != null && response.IsSuccess)
                 {
                     TempData["success"] = "Hotel number created successfully!";
@@ -62,11 +63,11 @@ namespace BookHotel_Frontend.Controllers
                 }
                 else
                 {
-                    TempData["error"] = response.Errors.FirstOrDefault() ?? "Error occurred while creating hotel number.";
+                    ModelState.AddModelError("Errors", response?.Errors?.FirstOrDefault() ?? "Error occurred while creating hotel number.");
                 }
             }
 
-            var res = await _IHotelService.GetAllAsync<APIResponse>(HttpContext.Session.GetString("JWTToken"));
+            var res = await _IHotelService.GetAllAsync<APIResponse>(HttpContext.Session.GetString(StaticDetails.SessionToken));
             if (res != null && res.IsSuccess)
             {
                 hotelNoCreateVM.HotelLists = JsonConvert.DeserializeObject<List<HotelsDTO>>(Convert.ToString(res.Result)).Select(u => new SelectListItem
@@ -81,13 +82,14 @@ namespace BookHotel_Frontend.Controllers
         public async Task<IActionResult> Update(int HotelNoId)
         {
             HotelNoUpdateVM hotelNoUpdateVM = new();
-            var response = await _IHotelNo.GetAsync<APIResponse>(HotelNoId, HttpContext.Session.GetString("JWTToken"));
+            var response = await _IHotelNo.GetAsync<APIResponse>(HotelNoId, HttpContext.Session.GetString(StaticDetails.SessionToken));
             if (response != null && response.IsSuccess)
             {
                 HotelNoDTO hotelNoDto = JsonConvert.DeserializeObject<HotelNoDTO>(Convert.ToString(response.Result));
                 hotelNoUpdateVM.hotelNoUpdateDTO = _IMapper.Map<HotelNoUpdateDTO>(hotelNoDto);
             }
-            response = await _IHotelService.GetAllAsync<APIResponse>(HttpContext.Session.GetString("JWTToken"));
+
+            response = await _IHotelService.GetAllAsync<APIResponse>(HttpContext.Session.GetString(StaticDetails.SessionToken));
             if (response != null && response.IsSuccess)
             {
                 hotelNoUpdateVM.HotelLists = JsonConvert.DeserializeObject<List<HotelsDTO>>(Convert.ToString(response.Result)).Select(u => new SelectListItem
@@ -97,6 +99,7 @@ namespace BookHotel_Frontend.Controllers
                 });
                 return View(hotelNoUpdateVM);
             }
+
             return NotFound();
         }
 
@@ -106,7 +109,7 @@ namespace BookHotel_Frontend.Controllers
         {
             if (ModelState.IsValid)
             {
-                var response = await _IHotelNo.UpdateAsync<APIResponse>(hotelNoUpdateVM.hotelNoUpdateDTO, HttpContext.Session.GetString("JWTToken"));
+                var response = await _IHotelNo.UpdateAsync<APIResponse>(hotelNoUpdateVM.hotelNoUpdateDTO, HttpContext.Session.GetString(StaticDetails.SessionToken));
                 if (response != null && response.IsSuccess)
                 {
                     TempData["success"] = "Hotel number updated successfully!";
@@ -114,11 +117,11 @@ namespace BookHotel_Frontend.Controllers
                 }
                 else
                 {
-                    TempData["error"] = response.Errors.FirstOrDefault() ?? "Error occurred while updating hotel number.";
+                    ModelState.AddModelError("Errors", response?.Errors?.FirstOrDefault() ?? "Error occurred while updating hotel number.");
                 }
             }
 
-            var res = await _IHotelService.GetAllAsync<APIResponse>(HttpContext.Session.GetString("JWTToken"));
+            var res = await _IHotelService.GetAllAsync<APIResponse>(HttpContext.Session.GetString(StaticDetails.SessionToken));
             if (res != null && res.IsSuccess)
             {
                 hotelNoUpdateVM.HotelLists = JsonConvert.DeserializeObject<List<HotelsDTO>>(Convert.ToString(res.Result)).Select(u => new SelectListItem
@@ -127,19 +130,21 @@ namespace BookHotel_Frontend.Controllers
                     Value = u.Id.ToString()
                 });
             }
+
             return View(hotelNoUpdateVM);
         }
 
         public async Task<IActionResult> Delete(int HotelNoId)
         {
             HotelNoDeleteVM hotelNoDeleteVM = new();
-            var response = await _IHotelNo.GetAsync<APIResponse>(HotelNoId, HttpContext.Session.GetString("JWTToken"));
+            var response = await _IHotelNo.GetAsync<APIResponse>(HotelNoId, HttpContext.Session.GetString(StaticDetails.SessionToken));
             if (response != null && response.IsSuccess)
             {
                 HotelNoDTO hotelNoDto = JsonConvert.DeserializeObject<HotelNoDTO>(Convert.ToString(response.Result));
                 hotelNoDeleteVM.hotelNoDTO = hotelNoDto;
             }
-            response = await _IHotelService.GetAllAsync<APIResponse>(HttpContext.Session.GetString("JWTToken"));
+
+            response = await _IHotelService.GetAllAsync<APIResponse>(HttpContext.Session.GetString(StaticDetails.SessionToken));
             if (response != null && response.IsSuccess)
             {
                 hotelNoDeleteVM.HotelLists = JsonConvert.DeserializeObject<List<HotelsDTO>>(Convert.ToString(response.Result)).Select(u => new SelectListItem
@@ -149,6 +154,7 @@ namespace BookHotel_Frontend.Controllers
                 });
                 return View(hotelNoDeleteVM);
             }
+
             return NotFound();
         }
 
@@ -156,7 +162,7 @@ namespace BookHotel_Frontend.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Delete(HotelNoDeleteVM hotelNoDeleteVM)
         {
-            var response = await _IHotelNo.DeleteAsync<APIResponse>(hotelNoDeleteVM.hotelNoDTO.HotelNumber, HttpContext.Session.GetString("JWTToken"));
+            var response = await _IHotelNo.DeleteAsync<APIResponse>(hotelNoDeleteVM.hotelNoDTO.HotelNumber, HttpContext.Session.GetString(StaticDetails.SessionToken));
             if (response != null && response.IsSuccess)
             {
                 TempData["success"] = "Hotel number deleted successfully!";
@@ -164,8 +170,9 @@ namespace BookHotel_Frontend.Controllers
             }
             else
             {
-                TempData["error"] = response.Errors.FirstOrDefault() ?? "Error occurred while deleting hotel number.";
+                ModelState.AddModelError("Errors", response?.Errors?.FirstOrDefault() ?? "Error occurred while deleting hotel number.");
             }
+
             return View(hotelNoDeleteVM);
         }
     }

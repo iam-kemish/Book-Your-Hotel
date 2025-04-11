@@ -47,7 +47,8 @@ namespace BookHotel_Frontend.Services
                         httpRequestMessage.Method = HttpMethod.Get;
                         break;
                 }
-                if (string.IsNullOrEmpty(apiRequest.token))
+                //Sets authorisation header only when Token.length > 0 i.e. Token isnt empty.
+                if (!string.IsNullOrEmpty(apiRequest.token))
                 {
                     client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", apiRequest.token);
                 }

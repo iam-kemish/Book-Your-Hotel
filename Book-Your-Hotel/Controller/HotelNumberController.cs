@@ -3,6 +3,7 @@ using AutoMapper;
 using Book_Your_Hotel.Models;
 using Book_Your_Hotel.Models.DTOs;
 using Book_Your_Hotel.Repositary.IRepositary;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Book_Your_Hotel.Controller
@@ -77,7 +78,7 @@ namespace Book_Your_Hotel.Controller
             response.IsSuccess = true;
             return Ok(response);
         }
-
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -133,7 +134,7 @@ namespace Book_Your_Hotel.Controller
 
             return response;
         }
-
+        [Authorize(Roles = "Admin")]
         [HttpPut("{id:int}", Name = "UpdateHotelNumber")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -170,7 +171,7 @@ namespace Book_Your_Hotel.Controller
 
             return response;
         }
-
+        [Authorize(Roles = "Admin")]
         [HttpDelete("{id:int}")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]

@@ -1,10 +1,11 @@
 ﻿using AutoMapper;
-using BookHotel_Frontend.Models;
 using BookHotel_Frontend.Models.DTOs;
 using BookHotel_Frontend.Services.IServices;
+using BookHotel_Utilities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
+using APIResponse = BookHotel_Frontend.Models.APIResponse;
 
 namespace BookHotel_Frontend.Controllers
 {
@@ -18,30 +19,31 @@ namespace BookHotel_Frontend.Controllers
             _IHotel = hotelService;
             _IMapper = mapper;
         }
+
         [Authorize]
         public async Task<IActionResult> Index()
         {
             List<HotelsDTO> ResultedList = new();
-            var response = await _IHotel.GetAllAsync<APIResponse>(HttpContext.Session.GetString("JWTToken"));
+            var response = await _IHotel.GetAllAsync<APIResponse>(HttpContext.Session.GetString(StaticDetails.SessionToken));
             if (response != null && response.IsSuccess)
             {
                 ResultedList = JsonConvert.DeserializeObject<List<HotelsDTO>>(Convert.ToString(response.Result));
             }
             return View(ResultedList);
         }
-        
-        public  IActionResult Create()
+
+        public IActionResult Create()
         {
             return View();
         }
-        [Authorize(Roles ="Admin")]
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(HotelCreateDTO hotelCreateDTO)
         {
             if (ModelState.IsValid)
             {
-                var response = await _IHotel.CreateAsync<APIResponse>(hotelCreateDTO, HttpContext.Session.GetString("JWTToken"));
+                var response = await _IHotel.CreateAsync<APIResponse>(hotelCreateDTO, HttpContext.Session.GetString(StaticDetails.SessionToken));
                 if (response != null && response.IsSuccess)
                 {
                     TempData["success"] = "Hotel created successfully!";
@@ -49,7 +51,7 @@ namespace BookHotel_Frontend.Controllers
                 }
                 else
                 {
-                    TempData["error"] = response.Errors.FirstOrDefault() ?? "Error occurred while creating hotel.";
+                    ModelState.AddModelError("Errors", response?.Errors?.FirstOrDefault() ?? "Error occurred while creating the hotel. Check if user is authorized.");
                 }
             }
             return View(hotelCreateDTO);
@@ -57,22 +59,22 @@ namespace BookHotel_Frontend.Controllers
 
         public async Task<IActionResult> Update(int hotelId)
         {
-            var response = await _IHotel.GetAsync<APIResponse>(hotelId, HttpContext.Session.GetString("JWTToken"));
+            var response = await _IHotel.GetAsync<APIResponse>(hotelId, HttpContext.Session.GetString(StaticDetails.SessionToken));
             if (response != null && response.IsSuccess)
             {
                 HotelsDTO hotelsDTO = JsonConvert.DeserializeObject<HotelsDTO>(Convert.ToString(response.Result));
                 return View(_IMapper.Map<HotelUpdateDTO>(hotelsDTO));
             }
-            return NotFound();
+            return BadRequest();
         }
-        [Authorize(Roles = "Admin")]
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Update(HotelUpdateDTO hotelUpdateDTO)
         {
             if (ModelState.IsValid)
             {
-                var response = await _IHotel.UpdateAsync<APIResponse>(hotelUpdateDTO, HttpContext.Session.GetString("JWTToken"));
+                var response = await _IHotel.UpdateAsync<APIResponse>(hotelUpdateDTO, HttpContext.Session.GetString(StaticDetails.SessionToken));
                 if (response != null && response.IsSuccess)
                 {
                     TempData["success"] = "Hotel updated successfully!";
@@ -80,7 +82,7 @@ namespace BookHotel_Frontend.Controllers
                 }
                 else
                 {
-                    TempData["error"] = response.Errors.FirstOrDefault() ?? "Error occurred while updating hotel.";
+                    ModelState.AddModelError("Errors", response?.Errors?.FirstOrDefault() ?? "Error occurred while updating hotel. Check if user is authorized.");
                 }
             }
             return View(hotelUpdateDTO);
@@ -88,20 +90,20 @@ namespace BookHotel_Frontend.Controllers
 
         public async Task<IActionResult> Delete(int HotelId)
         {
-            var response = await _IHotel.GetAsync<APIResponse>(HotelId, HttpContext.Session.GetString("JWTToken"));
+            var response = await _IHotel.GetAsync<APIResponse>(HotelId, HttpContext.Session.GetString(StaticDetails.SessionToken));
             if (response != null && response.IsSuccess)
             {
                 HotelsDTO hotelsDTO = JsonConvert.DeserializeObject<HotelsDTO>(Convert.ToString(response.Result));
                 return View(hotelsDTO);
             }
-            return NotFound();
+            return BadRequest();
         }
-        [Authorize(Roles = "Admin")]
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Delete(HotelsDTO hotelsDTO)
         {
-            var response = await _IHotel.DeleteAsync<APIResponse>(hotelsDTO.Id, HttpContext.Session.GetString("JWTToken"));
+            var response = await _IHotel.DeleteAsync<APIResponse>(hotelsDTO.Id, HttpContext.Session.GetString(StaticDetails.SessionToken));
             if (response != null && response.IsSuccess)
             {
                 TempData["success"] = "Hotel deleted successfully!";
@@ -109,7 +111,7 @@ namespace BookHotel_Frontend.Controllers
             }
             else
             {
-                TempData["error"] = response.Errors.FirstOrDefault() ?? "Error occurred while deleting hotel.";
+                ModelState.AddModelError("Errors", response?.Errors?.FirstOrDefault() ?? "Error occurred while deleting hotel. Check if user is authorized.");
             }
             return View(hotelsDTO);
         }
