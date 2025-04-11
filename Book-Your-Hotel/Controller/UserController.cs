@@ -16,7 +16,7 @@ namespace Book_Your_Hotel.Controller
             _IUser = user;
             _ApiResponse = new APIResponse();
         }
-        [HttpPost("Login")]
+        [HttpPost("Login")] 
 
         public async Task<ActionResult<APIResponse>> Login([FromBody] LoginRequestDTO loginRequest)
         {

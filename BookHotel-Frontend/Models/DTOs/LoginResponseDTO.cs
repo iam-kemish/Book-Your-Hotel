@@ -1,6 +1,4 @@
-﻿using Book_Your_Hotel.Models;
-
-namespace BookHotel_Frontend.Models.DTOs
+﻿namespace BookHotel_Frontend.Models.DTOs
 {
     public class LoginResponseDTO
     {

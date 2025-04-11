@@ -1,7 +1,7 @@
-﻿using Azure;
-using BookHotel_Frontend.Models;
+﻿using BookHotel_Frontend.Models;
 using BookHotel_Frontend.Models.DTOs;
 using BookHotel_Frontend.Services.IServices;
+using BookHotel_Utilities;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
@@ -19,7 +19,8 @@ namespace BookHotel_Frontend.Controllers
         [HttpGet]
         public IActionResult Login()
         {
-            return View();
+            LoginRequestDTO loginRequestDTO = new LoginRequestDTO();
+            return View(loginRequestDTO);
         }
 
         [HttpPost]
@@ -30,7 +31,7 @@ namespace BookHotel_Frontend.Controllers
             if(aPIResponse != null && aPIResponse.IsSuccess)
             {
                 LoginResponseDTO model = JsonConvert.DeserializeObject<LoginResponseDTO>(Convert.ToString(aPIResponse.Result));
-                HttpContext.Session.SetString("JWTToken", model.Token);
+                HttpContext.Session.SetString(StaticDetails.SessionToken, model.Token);
                 return RedirectToAction("Index", "Home");
             }
             else
@@ -53,7 +54,7 @@ namespace BookHotel_Frontend.Controllers
         public async Task<IActionResult> Register(RegisterRequestDTO registerRequestDTO)
         {
             APIResponse aPIResponse = await _IAuth.RegisterAsync<APIResponse>(registerRequestDTO);
-            if(aPIResponse == null && aPIResponse.IsSuccess)
+            if(aPIResponse != null && aPIResponse.IsSuccess)
             {
                 return RedirectToAction("Login");
             }
@@ -63,7 +64,7 @@ namespace BookHotel_Frontend.Controllers
         public async Task<IActionResult> Logout()
         {
             await HttpContext.SignOutAsync();
-            HttpContext.Session.SetString("JWTToken", "");
+            HttpContext.Session.SetString(StaticDetails.SessionToken, "");
             return RedirectToAction("Index", "Home");
         }
 
