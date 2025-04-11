@@ -1,8 +1,10 @@
-﻿using BookHotel_Frontend.Models;
+﻿using System.Security.Claims;
+using BookHotel_Frontend.Models;
 using BookHotel_Frontend.Models.DTOs;
 using BookHotel_Frontend.Services.IServices;
 using BookHotel_Utilities;
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 
@@ -31,6 +33,11 @@ namespace BookHotel_Frontend.Controllers
             if(aPIResponse != null && aPIResponse.IsSuccess)
             {
                 LoginResponseDTO model = JsonConvert.DeserializeObject<LoginResponseDTO>(Convert.ToString(aPIResponse.Result));
+                var identity = new ClaimsIdentity(CookieAuthenticationDefaults.AuthenticationScheme);
+                identity.AddClaim(new Claim(ClaimTypes.Name, model.User.UserName));
+                identity.AddClaim(new Claim(ClaimTypes.Role, model.User.Role));
+                var Principal = new ClaimsPrincipal(identity);
+                await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, Principal);
                 HttpContext.Session.SetString(StaticDetails.SessionToken, model.Token);
                 return RedirectToAction("Index", "Home");
             }
