@@ -1,4 +1,5 @@
-﻿using AutoMapper;
+﻿using Asp.Versioning;
+using AutoMapper;
 using Book_Your_Hotel.Models;
 using Book_Your_Hotel.Models.DTOs;
 using Book_Your_Hotel.Repositary.IRepositary;
@@ -8,7 +9,9 @@ using System.Net;
 
 namespace Book_Your_Hotel.Controller
 {
-    [Route("api/HotelLists")]
+    [Route("api/v{version:apiVersion}/HotelLists")]
+    [ApiVersion("2.0")]
+    [ApiVersion("1.0")]
     [ApiController]
     public class HotelController : ControllerBase
     {
@@ -45,6 +48,12 @@ namespace Book_Your_Hotel.Controller
                 response.Errors = new List<string> { ex.Message };
             }
             return Ok(response);
+        }
+        [MapToApiVersion("2.0")]
+        [HttpGet]
+        public IEnumerable<string> Get()
+        {
+            return new string[] { "Kemish", "kemish1" };
         }
      
         [HttpGet("{id:int}")]

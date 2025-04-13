@@ -1,4 +1,5 @@
 using System.Text;
+using Asp.Versioning;
 using Book_Your_Hotel.Database;
 using Book_Your_Hotel.Mapper;
 using Book_Your_Hotel.Repositary;
@@ -7,6 +8,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using Asp.Versioning.Conventions;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -21,6 +23,18 @@ builder.Services.AddScoped<IHotelRepo, HotelCLass>();
 builder.Services.AddScoped<IHotelNoRepo, HotelNoClass>();
 builder.Services.AddScoped<IUser, UserClass>();
 builder.Services.AddAutoMapper(typeof(MappingConfig));
+builder.Services.AddApiVersioning(options =>
+{
+    options.DefaultApiVersion = new ApiVersion(1, 0);
+    options.AssumeDefaultVersionWhenUnspecified = true;
+    options.ReportApiVersions = true;
+}).AddMvc(options =>
+{
+    options.Conventions.Add(new VersionByNamespaceConvention());
+}).AddApiExplorer(options =>{
+    options.GroupNameFormat = "'v'VVV";
+    options.SubstituteApiVersionInUrl = true;
+});
 
 // JWT Authentication
 var key = builder.Configuration.GetValue<string>("JwtSettings:SecretKey");
