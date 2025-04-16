@@ -1,4 +1,5 @@
 ﻿using System.Net;
+using Asp.Versioning;
 using AutoMapper;
 using Book_Your_Hotel.Models;
 using Book_Your_Hotel.Models.DTOs;
@@ -6,10 +7,11 @@ using Book_Your_Hotel.Repositary.IRepositary;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Book_Your_Hotel.Controller
+namespace Book_Your_Hotel.Controller.V1
 {
     [Route("api/v{version:apiVersion}/HotelNumbers")]
     [ApiController]
+    [ApiVersion("1.0", Deprecated = true)]
     public class HotelNumberController : ControllerBase
     {
         private readonly IHotelNoRepo _IHotelNo;

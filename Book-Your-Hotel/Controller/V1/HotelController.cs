@@ -7,12 +7,12 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
 
-namespace Book_Your_Hotel.Controller
+namespace Book_Your_Hotel.Controller.V1
 {
     [Route("api/v{version:apiVersion}/HotelLists")]
   
     [ApiController]
-  
+    [ApiVersion("1.0", Deprecated =true)]
     public class HotelController : ControllerBase
     {
         private readonly ILogger<HotelController> _logger;
@@ -49,13 +49,16 @@ namespace Book_Your_Hotel.Controller
             }
             return Ok(response);
         }
-        [MapToApiVersion("2.0")]
-        [HttpGet]
+
+//dummy data//////////////////////////////////////////////////////////////
+        [HttpGet("GetdUMMY")]
         public IEnumerable<string> Get()
         {
             return new string[] { "Kemish", "kemish1" };
         }
-     
+
+
+        ///////////////////////////////////////////////////////////////////
         [HttpGet("{id:int}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
