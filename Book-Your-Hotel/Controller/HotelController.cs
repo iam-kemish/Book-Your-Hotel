@@ -10,9 +10,9 @@ using System.Net;
 namespace Book_Your_Hotel.Controller
 {
     [Route("api/v{version:apiVersion}/HotelLists")]
-    [ApiVersion("2.0")]
-    [ApiVersion("1.0")]
+  
     [ApiController]
+  
     public class HotelController : ControllerBase
     {
         private readonly ILogger<HotelController> _logger;

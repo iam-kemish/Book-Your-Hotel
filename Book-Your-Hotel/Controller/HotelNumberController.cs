@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Book_Your_Hotel.Controller
 {
-    [Route("api/HotelNumbers")]
+    [Route("api/v{version:apiVersion}/HotelNumbers")]
     [ApiController]
     public class HotelNumberController : ControllerBase
     {

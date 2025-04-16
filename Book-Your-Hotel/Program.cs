@@ -86,6 +86,20 @@ builder.Services.AddSwaggerGen(options =>
             new List<string>()
         }
     });
+    options.SwaggerDoc("v1", new OpenApiInfo
+    {
+        Version = "v1",
+        Title = "HotelsApi",
+        Description = "API to manage Hotels(Depriciated).",
+
+    });
+    options.SwaggerDoc("v2", new OpenApiInfo
+    {
+        Version = "v2",
+        Title = "HotelsApi version 2",
+        Description = "API to manage Hotels",
+
+    });
 });
 
 builder.Services.AddControllers();
@@ -97,7 +111,11 @@ var app = builder.Build();
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
-    app.UseSwaggerUI();
+    app.UseSwaggerUI(options =>
+    {
+        options.SwaggerEndpoint("/swagger/v1/swagger.json", "Hotels_Api_v1");
+        options.SwaggerEndpoint("/swagger/v2/swagger.json", "Hotels_Api_v2");
+    });
 }
 
 app.UseHttpsRedirection();
