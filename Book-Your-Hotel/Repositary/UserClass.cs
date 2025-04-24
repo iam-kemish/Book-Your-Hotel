@@ -6,6 +6,7 @@ using Book_Your_Hotel.Database;
 using Book_Your_Hotel.Models;
 using Book_Your_Hotel.Models.DTOs;
 using Book_Your_Hotel.Repositary.IRepositary;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 
 namespace Book_Your_Hotel.Repositary
@@ -34,7 +35,7 @@ namespace Book_Your_Hotel.Repositary
 
         public async Task<LoginResponseDTO> Login(LoginRequestDTO request)
         {
-            var user = _Db.LocalUsers.FirstOrDefault(u => u.UserName.ToLower() == request.UserName.ToLower() && u.Password == request.Password);
+            var user =  await _Db.LocalUsers.FirstOrDefaultAsync(u => u.UserName.ToLower() == request.UserName.ToLower() && u.Password == request.Password);
             if (user == null)
             {
                 return null;

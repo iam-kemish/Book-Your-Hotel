@@ -1,4 +1,6 @@
 using System.Text;
+using Asp.Versioning;
+using Asp.Versioning.Routing;
 using Book_Your_Hotel.Database;
 using Book_Your_Hotel.Mapper;
 using Book_Your_Hotel.Repositary;
@@ -41,10 +43,31 @@ builder.Services.AddAuthentication(x =>
         ValidateAudience = false
     };
 });
+builder.Services.Configure<RouteOptions>(options =>
+{
+    options.ConstraintMap.Add("apiVersion", typeof(ApiVersionRouteConstraint));
+});
 
-// Swagger Configuration with JWT support
+
+//Add API Versioning before Swagger
+builder.Services.AddApiVersioning(options =>
+{
+    options.AssumeDefaultVersionWhenUnspecified = true;
+    options.DefaultApiVersion = new ApiVersion(2, 0);
+    options.ReportApiVersions = true;// This matches v{version} in route
+})
+.AddApiExplorer(options =>
+{
+    options.GroupNameFormat = "'v'VVV";
+    options.SubstituteApiVersionInUrl = true;
+});
+
+
+
+// Swagger Configuration with JWT support and API versioning support
 builder.Services.AddSwaggerGen(options =>
 {
+    // Security definition for JWT
     options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {
         Name = "Authorization",
@@ -66,12 +89,25 @@ builder.Services.AddSwaggerGen(options =>
                     Id = "Bearer",
                 },
                 Scheme = "oauth2",
-                Name= "Bearer",
+                Name = "Bearer",
                 In = ParameterLocation.Header
             },
             new List<string>()
         }
     });
+    options.SwaggerDoc("v1", new OpenApiInfo
+    {
+        Version = "v1",
+        Title = "HotelsApi V1"
+    });
+    options.SwaggerDoc("v2", new OpenApiInfo
+    {
+        Version = "v2",
+        Title = "HotelsApi V2"
+    });
+
+
+
 });
 
 builder.Services.AddControllers();
@@ -83,12 +119,17 @@ var app = builder.Build();
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
-    app.UseSwaggerUI();
+    
+    app.UseSwaggerUI(options =>
+    {
+        options.SwaggerEndpoint("/swagger/v2/swagger.json", "HotelsApiV2");
+        options.SwaggerEndpoint("/swagger/v1/swagger.json", "HotelsApiV1");
+    });
 }
 
 app.UseHttpsRedirection();
 
-app.UseAuthentication();  
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();

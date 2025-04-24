@@ -24,7 +24,7 @@ namespace BookHotel_Frontend.Services
              {
                  ApiType = StaticDetails.ApiType.POST,
                  Data = loginRequestDTO,
-                 Url = HotelNoUrl + "api/Users/Login/"
+                 Url = HotelNoUrl+"api/v2/Users/Login/"
              }
 
              );
@@ -37,7 +37,7 @@ namespace BookHotel_Frontend.Services
              {
                  ApiType = StaticDetails.ApiType.POST,
                  Data = registerRequestDTO,
-                 Url = HotelNoUrl + "api/Users/Register/"
+                 Url = HotelNoUrl+ "api/v2/Users/Register/"
              }
 
              );

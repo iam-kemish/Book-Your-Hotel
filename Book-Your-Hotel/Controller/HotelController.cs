@@ -1,4 +1,5 @@
-﻿using AutoMapper;
+﻿using Asp.Versioning;
+using AutoMapper;
 using Book_Your_Hotel.Models;
 using Book_Your_Hotel.Models.DTOs;
 using Book_Your_Hotel.Repositary.IRepositary;
@@ -8,8 +9,15 @@ using System.Net;
 
 namespace Book_Your_Hotel.Controller
 {
-    [Route("api/HotelLists")]
+
+    [Route("api/v2/HotelLists")]
+    //[Route("api/v{version:apiVersion}/VillaAPI")]
+    //[Route("api/HotelLists")]
     [ApiController]
+    [ApiVersion(1)]
+    [ApiVersion(2)]
+    //[ApiVersion("1.0")]
+    //[ApiVersion("2.0")]
     public class HotelController : ControllerBase
     {
         private readonly ILogger<HotelController> _logger;
@@ -25,11 +33,11 @@ namespace Book_Your_Hotel.Controller
         }
 
         [HttpGet]
-    
+
         [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<ActionResult<APIResponse>> GetAllHotels()
         {
-            
+
             try
             {
                 _logger.LogInformation("Getting all the hotels list");
@@ -46,7 +54,7 @@ namespace Book_Your_Hotel.Controller
             }
             return Ok(response);
         }
-     
+
         [HttpGet("{id:int}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -55,7 +63,7 @@ namespace Book_Your_Hotel.Controller
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         public async Task<ActionResult<APIResponse>> GetHotel(int id)
         {
-            
+
             if (id == 0)
             {
                 response.HttpStatusCode = HttpStatusCode.BadRequest;
@@ -85,7 +93,7 @@ namespace Book_Your_Hotel.Controller
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         public async Task<ActionResult<APIResponse>> CreateHotel([FromBody] HotelCreateDTO newHotel)
         {
-            
+
             if (newHotel == null)
             {
                 response.HttpStatusCode = HttpStatusCode.BadRequest;
@@ -119,7 +127,7 @@ namespace Book_Your_Hotel.Controller
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         public async Task<ActionResult<APIResponse>> DeleteHotel(int id)
         {
-            
+
             if (id == 0)
             {
                 response.HttpStatusCode = HttpStatusCode.BadRequest;
@@ -151,7 +159,7 @@ namespace Book_Your_Hotel.Controller
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         public async Task<ActionResult<APIResponse>> UpdateHotel(int id, [FromBody] HotelUpdateDTO toUpdateDTO)
         {
-            
+
             if (id == 0 || toUpdateDTO.Id == 0)
             {
                 response.HttpStatusCode = HttpStatusCode.BadRequest;

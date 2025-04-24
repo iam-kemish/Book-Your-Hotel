@@ -2,11 +2,16 @@
 using Book_Your_Hotel.Models;
 using Book_Your_Hotel.Repositary.IRepositary;
 using Microsoft.AspNetCore.Mvc;
+using Asp.Versioning;
 
 namespace Book_Your_Hotel.Controller
 {
-    [Route("api/Users")]
+    [Route("api/v2/Users")]
+    //[Route("api/v{version:apiVersion}/Users")]
+    //[Route("api/Users")]
     [ApiController]
+    [ApiVersion(1)]
+    [ApiVersion(2)]
     public class UserController : ControllerBase
     {
         private readonly IUser _IUser;

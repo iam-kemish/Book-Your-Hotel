@@ -1,5 +1,6 @@
 ﻿using System.Net.Http.Headers;
 using System.Text;
+using Book_Your_Hotel.Models;
 using BookHotel_Frontend.Models;
 using BookHotel_Frontend.Services.IServices;
 using Newtonsoft.Json;
@@ -54,6 +55,24 @@ namespace BookHotel_Frontend.Services
                 }
                 HttpResponseMessage httpResponseMessage = await client.SendAsync(httpRequestMessage);
                 var apiContent = await httpResponseMessage.Content.ReadAsStringAsync();
+                try
+                {
+                    APIResponse apiResponse = JsonConvert.DeserializeObject<APIResponse>(apiContent);
+                    if (apiResponse.HttpStatusCode == System.Net.HttpStatusCode.BadRequest
+                        || apiResponse.HttpStatusCode == System.Net.HttpStatusCode.NotFound)
+                    {
+                        apiResponse.HttpStatusCode = System.Net.HttpStatusCode.BadRequest;
+                        apiResponse.IsSuccess = false;
+                        var res = JsonConvert.SerializeObject(apiResponse);
+                        var returnObj = JsonConvert.DeserializeObject<T>(res);
+                        return returnObj;
+                    }
+                }
+                catch (Exception e)
+                {
+                    var exceptionResponse = JsonConvert.DeserializeObject<T>(apiContent);
+                    return exceptionResponse;
+                }
                 var ApiReturnedData = JsonConvert.DeserializeObject<T>(apiContent);
 
                 return ApiReturnedData;

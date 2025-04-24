@@ -1,4 +1,5 @@
 ﻿using System.Net;
+using Asp.Versioning;
 using AutoMapper;
 using Book_Your_Hotel.Models;
 using Book_Your_Hotel.Models.DTOs;
@@ -8,8 +9,14 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Book_Your_Hotel.Controller
 {
-    [Route("api/HotelNumbers")]
+    [Route("api/v2/HotelNumbers")]
+    //[Route("api/v{version:apiVersion}/HotelNumbers")]
+    //[Route("api/HotelNumbers")]
     [ApiController]
+    [ApiVersion(1)]
+    [ApiVersion(2)]
+    //[ApiVersion("1.0")]
+    //[ApiVersion("2.0")]
     public class HotelNumberController : ControllerBase
     {
         private readonly IHotelNoRepo _IHotelNo;
