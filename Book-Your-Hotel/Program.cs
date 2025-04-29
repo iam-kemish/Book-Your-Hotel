@@ -1,11 +1,10 @@
 using System.Text;
-using Asp.Versioning;
-using Asp.Versioning.Routing;
 using Book_Your_Hotel.Database;
 using Book_Your_Hotel.Mapper;
 using Book_Your_Hotel.Repositary;
 using Book_Your_Hotel.Repositary.IRepositary;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
@@ -17,8 +16,9 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 {
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
 });
-
+builder.Services.AddResponseCaching();
 // Dependency Injection
+
 builder.Services.AddScoped<IHotelRepo, HotelCLass>();
 builder.Services.AddScoped<IHotelNoRepo, HotelNoClass>();
 builder.Services.AddScoped<IUser, UserClass>();
@@ -43,26 +43,6 @@ builder.Services.AddAuthentication(x =>
         ValidateAudience = false
     };
 });
-builder.Services.Configure<RouteOptions>(options =>
-{
-    options.ConstraintMap.Add("apiVersion", typeof(ApiVersionRouteConstraint));
-});
-
-
-//Add API Versioning before Swagger
-builder.Services.AddApiVersioning(options =>
-{
-    options.AssumeDefaultVersionWhenUnspecified = true;
-    options.DefaultApiVersion = new ApiVersion(2, 0);
-    options.ReportApiVersions = true;// This matches v{version} in route
-})
-.AddApiExplorer(options =>
-{
-    options.GroupNameFormat = "'v'VVV";
-    options.SubstituteApiVersionInUrl = true;
-});
-
-
 
 // Swagger Configuration with JWT support and API versioning support
 builder.Services.AddSwaggerGen(options =>
@@ -110,7 +90,13 @@ builder.Services.AddSwaggerGen(options =>
 
 });
 
-builder.Services.AddControllers();
+builder.Services.AddControllers(option => {
+option.CacheProfiles.Add("Default30",
+   new CacheProfile()
+   {
+       Duration = 30
+   });
+}).AddNewtonsoftJson().AddXmlDataContractSerializerFormatters();
 builder.Services.AddEndpointsApiExplorer();
 
 var app = builder.Build();

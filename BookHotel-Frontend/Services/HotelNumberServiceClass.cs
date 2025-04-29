@@ -23,7 +23,7 @@ namespace BookHotel_Frontend.Services
                 {
                     ApiType = StaticDetails.ApiType.POST,
                     Data = dto,
-                    Url = HotelNoUrl+ "api/v2/HotelNumbers/",
+                    Url = HotelNoUrl+ "api/HotelNumbers/",
                     token = Token
                 }
 
@@ -36,7 +36,7 @@ namespace BookHotel_Frontend.Services
                 new ApiRequest
                 {
                     ApiType = StaticDetails.ApiType.DELETE,
-                    Url = HotelNoUrl+ "api/v2/HotelNumbers/" + id,
+                    Url = HotelNoUrl+ "api/HotelNumbers/" + id,
                     token = Token
                 }
 
@@ -49,7 +49,7 @@ namespace BookHotel_Frontend.Services
                  new ApiRequest
                  {
                      ApiType = StaticDetails.ApiType.GET,                   
-                     Url = HotelNoUrl+ "api/v2/HotelNumbers/",
+                     Url = HotelNoUrl+ "api/HotelNumbers/",
                      token = Token
                  }
 
@@ -62,7 +62,7 @@ namespace BookHotel_Frontend.Services
                 new ApiRequest
                 {
                     ApiType = StaticDetails.ApiType.GET,
-                    Url = HotelNoUrl+ "api/v2/HotelNumbers/" + id,
+                    Url = HotelNoUrl+ "api/HotelNumbers/" + id,
                     token = Token
                 }
                 );
@@ -74,7 +74,7 @@ namespace BookHotel_Frontend.Services
             { 
                 ApiType = StaticDetails.ApiType.PUT, 
                 Data = dto,
-                Url = HotelNoUrl + "api/v2/HotelNumbers/" + dto.HotelNumber,
+                Url = HotelNoUrl + "api/HotelNumbers/" + dto.HotelNumber,
                 token = Token
             });
         }
