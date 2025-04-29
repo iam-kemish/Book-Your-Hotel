@@ -1,4 +1,5 @@
 ﻿using System.Net;
+using Asp.Versioning;
 using AutoMapper;
 using Book_Your_Hotel.Models;
 using Book_Your_Hotel.Models.DTOs;
@@ -8,20 +9,22 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Book_Your_Hotel.Controller
 {
+
     [Route("api/HotelNumbers")]
-   
+
     [ApiController]
-    
-   
+
+
+
     public class HotelNumberController : ControllerBase
     {
         private readonly IHotelNoRepo _IHotelNo;
-        private readonly ILogger<HotelController> _logger;
+        private readonly ILogger<HotelNumberController> _logger;
         private readonly APIResponse response;
         private readonly IMapper _IMapper;
         private readonly IHotelRepo _IHotel;
 
-        public HotelNumberController(IHotelNoRepo hotelNoRepo, ILogger<HotelController> logger, IMapper mapper, IHotelRepo iHotel)
+        public HotelNumberController(IHotelNoRepo hotelNoRepo, ILogger<HotelNumberController> logger, IMapper mapper, IHotelRepo iHotel)
         {
             _IHotelNo = hotelNoRepo;
             _logger = logger;

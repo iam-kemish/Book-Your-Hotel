@@ -2,13 +2,13 @@
 using Book_Your_Hotel.Models;
 using Book_Your_Hotel.Repositary.IRepositary;
 using Microsoft.AspNetCore.Mvc;
+using Asp.Versioning;
 
 namespace Book_Your_Hotel.Controller
 {
     [Route("api/Users")]
     [ApiController]
-   
-   
+
     public class UserController : ControllerBase
     {
         private readonly IUser _IUser;
@@ -18,7 +18,7 @@ namespace Book_Your_Hotel.Controller
             _IUser = user;
             _ApiResponse = new APIResponse();
         }
-        [HttpPost("Login")] 
+        [HttpPost("Login")]
 
         public async Task<ActionResult<APIResponse>> Login([FromBody] LoginRequestDTO loginRequest)
         {
@@ -39,14 +39,16 @@ namespace Book_Your_Hotel.Controller
         public async Task<ActionResult<APIResponse>> Register([FromBody] RegisterationRequestDTO registerationRequest)
         {
             bool CheckUser = _IUser.IsUniqueUser(registerationRequest.UserName);
-            if (!CheckUser) {
+            if (!CheckUser)
+            {
                 _ApiResponse.HttpStatusCode = System.Net.HttpStatusCode.BadRequest;
                 _ApiResponse.IsSuccess = false;
                 _ApiResponse.Errors.Add("Username already exists.");
                 return BadRequest(_ApiResponse);
             }
             var registeredUser = await _IUser.Register(registerationRequest);
-            if (registeredUser == null) {
+            if (registeredUser == null)
+            {
                 _ApiResponse.HttpStatusCode = System.Net.HttpStatusCode.BadRequest;
                 _ApiResponse.IsSuccess = false;
                 _ApiResponse.Errors.Add("Error while registering.");
@@ -54,7 +56,7 @@ namespace Book_Your_Hotel.Controller
 
             }
             _ApiResponse.HttpStatusCode = System.Net.HttpStatusCode.OK;
-          
+
             return Ok(_ApiResponse);
 
         }

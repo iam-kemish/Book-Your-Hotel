@@ -1,4 +1,5 @@
 using System.Text;
+using Asp.Versioning;
 using Book_Your_Hotel.Database;
 using Book_Your_Hotel.Mapper;
 using Book_Your_Hotel.Repositary;
@@ -8,6 +9,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using Asp.Versioning.Conventions;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -17,12 +19,14 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
 });
 builder.Services.AddResponseCaching();
-// Dependency Injection
 
+// Dependency Injection
 builder.Services.AddScoped<IHotelRepo, HotelCLass>();
 builder.Services.AddScoped<IHotelNoRepo, HotelNoClass>();
 builder.Services.AddScoped<IUser, UserClass>();
 builder.Services.AddAutoMapper(typeof(MappingConfig));
+
+
 
 // JWT Authentication
 var key = builder.Configuration.GetValue<string>("JwtSettings:SecretKey");
@@ -75,49 +79,29 @@ builder.Services.AddSwaggerGen(options =>
             new List<string>()
         }
     });
-    options.SwaggerDoc("v1", new OpenApiInfo
-    {
-        Version = "v1",
-        Title = "HotelsApi V1"
-    });
-    options.SwaggerDoc("v2", new OpenApiInfo
-    {
-        Version = "v2",
-        Title = "HotelsApi V2"
-    });
 
-
-
+   
 });
 
-builder.Services.AddControllers(option => {
-option.CacheProfiles.Add("Default30",
-   new CacheProfile()
-   {
-       Duration = 30
-   });
+builder.Services.AddControllers(option =>
+{
+    option.CacheProfiles.Add("Default30", new CacheProfile() { Duration = 30 });
 }).AddNewtonsoftJson().AddXmlDataContractSerializerFormatters();
+
 builder.Services.AddEndpointsApiExplorer();
 
 var app = builder.Build();
 
-// Middlewares
+// Middleware Configuration
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
-    
-    app.UseSwaggerUI(options =>
-    {
-        options.SwaggerEndpoint("/swagger/v2/swagger.json", "HotelsApiV2");
-        options.SwaggerEndpoint("/swagger/v1/swagger.json", "HotelsApiV1");
-    });
+    app.UseSwaggerUI();
 }
 
 app.UseHttpsRedirection();
-
 app.UseAuthentication();
 app.UseAuthorization();
-
 app.MapControllers();
 
 app.Run();

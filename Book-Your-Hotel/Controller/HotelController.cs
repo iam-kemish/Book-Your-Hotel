@@ -1,4 +1,5 @@
-﻿using AutoMapper;
+﻿using Asp.Versioning;
+using AutoMapper;
 using Book_Your_Hotel.Models;
 using Book_Your_Hotel.Models.DTOs;
 using Book_Your_Hotel.Repositary.IRepositary;
@@ -8,13 +9,10 @@ using System.Net;
 
 namespace Book_Your_Hotel.Controller
 {
-
     [Route("api/HotelLists")]
-    
+
     [ApiController]
-  
-  
-   
+    
     public class HotelController : ControllerBase
     {
         private readonly ILogger<HotelController> _logger;
@@ -30,7 +28,7 @@ namespace Book_Your_Hotel.Controller
         }
 
         [HttpGet]
-        [ResponseCache(Duration = 30)]
+
         [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<ActionResult<APIResponse>> GetAllHotels()
         {
@@ -52,8 +50,8 @@ namespace Book_Your_Hotel.Controller
             return Ok(response);
         }
 
+
         [HttpGet("{id:int}")]
-        [ResponseCache(Duration = 30)]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
