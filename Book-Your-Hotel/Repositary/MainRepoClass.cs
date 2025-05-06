@@ -45,13 +45,24 @@ namespace Book_Your_Hotel.Repositary
             return await Query.FirstOrDefaultAsync();
         }
 
-        public async Task<List<T>> GetAllAsync(Expression<Func<T, bool>>? filter = null, string? includeProperties = null)
+        public async Task<List<T>> GetAllAsync(Expression<Func<T, bool>>? filter = null, string? includeProperties = null, int PageSize = 3, int PageNumber = 1)
         {
             IQueryable<T> Query = DbSet;
             if (filter != null)
             {
                 Query = Query.Where(filter);
             };
+            if(PageSize > 0)
+            {
+                if(PageSize > 100)
+                {
+                    //defaulting page size as 100
+                    PageSize = 100;
+                }
+                //suppose if page size is 3 and pagenum is 1, a/c to below formula (3 * (1-1).take(3)), it means we skip 0 records and display 3 records,
+                //suppose if page size is 3 and pagenum is 2, a/c to below formula (3 * (2-1).take(3)), it means we skip 3 records and display next 3 records.
+                Query = Query.Skip(PageSize * (PageNumber - 1)).Take(PageSize);
+            }
             if (includeProperties != null)
             {
                 foreach (var includeProp in includeProperties.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries))

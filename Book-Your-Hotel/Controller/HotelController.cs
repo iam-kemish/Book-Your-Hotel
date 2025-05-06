@@ -30,7 +30,7 @@ namespace Book_Your_Hotel.Controller
         [HttpGet]
 
         [ProducesResponseType(StatusCodes.Status200OK)]
-        public async Task<ActionResult<APIResponse>> GetAllHotels([FromQuery] int? occupancy)
+        public async Task<ActionResult<APIResponse>> GetAllHotels([FromQuery] int? occupancy, int PageSize = 2, int PageNumber = 1)
         {
 
             try
@@ -40,17 +40,17 @@ namespace Book_Your_Hotel.Controller
                 // = await _IHotel.GetAllAsync();
                 if (occupancy > 0 && occupancy < 5) { 
                 
-                hotelLists = await _IHotel.GetAllAsync(u=>u.AvailableRooms > 1 && u.AvailableRooms < 5 );
+                hotelLists = await _IHotel.GetAllAsync(u=>u.AvailableRooms > 1 && u.AvailableRooms < 5, PageSize: PageSize, PageNumber: PageNumber );
                 }else if(occupancy > 5 && occupancy < 10)
                 {
-                    hotelLists = await _IHotel.GetAllAsync(u => u.AvailableRooms > 3 && u.AvailableRooms < 10);
+                    hotelLists = await _IHotel.GetAllAsync(u => u.AvailableRooms > 3 && u.AvailableRooms < 10, PageSize: PageSize, PageNumber: PageNumber);
                 }
                 else if(occupancy > 10)
                 {
-                    hotelLists = await _IHotel.GetAllAsync(u=> u.AvailableRooms > 5);
+                    hotelLists = await _IHotel.GetAllAsync(u=> u.AvailableRooms > 5, PageSize: PageSize, PageNumber: PageNumber);
                 }else
                 {
-                    hotelLists = await _IHotel.GetAllAsync();
+                    hotelLists = await _IHotel.GetAllAsync( PageSize: PageSize, PageNumber: PageNumber);
                 }
 
                 response.Result = _IMapper.Map<List<HotelsDTO>>(hotelLists);
