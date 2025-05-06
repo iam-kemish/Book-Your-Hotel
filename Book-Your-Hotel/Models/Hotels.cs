@@ -14,7 +14,9 @@ namespace Book_Your_Hotel.Models
 
         public DateTime CreatedOn { get; set; }
         public DateTime UpdatedOn { get; set; }
-       public string ImageUrl { get; set; } 
+       public string ImageUrl { get; set; }
+        public int AvailableRooms { get; set; }
+        public int Occupancy { get; set; }
         public int NumberOfRooms { get; set; }
        
         [Range(500, int.MaxValue, ErrorMessage = "Price must be greater than or equal to 500.")]

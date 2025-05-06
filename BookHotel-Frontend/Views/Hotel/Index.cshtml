@@ -17,6 +17,7 @@
             <tr>
                 <th>Name</th>
                 <th>No. of rooms</th>
+                <th>Occupancy</th>
                 <th>Price</th>
                 <th></th>
             </tr>
@@ -27,6 +28,7 @@
                 <tr>
                     <td>@item.Name</td>
                     <td>@item.NumberOfRooms</td>
+                    <td>@item.Occupancy</td>
                     <td>Rs.@item.Price</td>
                     <td>
                         <a asp-controller="Hotel" asp-action="Update" asp-route-HotelId="@item.Id" class="btn btn-success">

@@ -15,6 +15,8 @@ namespace Book_Your_Hotel.Models.DTOs
 
         [Required]
         public int NumberOfRooms { get; set; }
+        [Required]
+        public int Occupancy { get; set; }
 
         [Required]
         [Range(500, int.MaxValue, ErrorMessage = "Price must be greater than or equal to 500.")]

@@ -30,13 +30,29 @@ namespace Book_Your_Hotel.Controller
         [HttpGet]
 
         [ProducesResponseType(StatusCodes.Status200OK)]
-        public async Task<ActionResult<APIResponse>> GetAllHotels()
+        public async Task<ActionResult<APIResponse>> GetAllHotels([FromQuery] int? occupancy)
         {
 
             try
             {
                 _logger.LogInformation("Getting all the hotels list");
-                IEnumerable<Hotels> hotelLists = await _IHotel.GetAllAsync();
+                List<Hotels> hotelLists;
+                // = await _IHotel.GetAllAsync();
+                if (occupancy > 0 && occupancy < 5) { 
+                
+                hotelLists = await _IHotel.GetAllAsync(u=>u.AvailableRooms > 1 && u.AvailableRooms < 5 );
+                }else if(occupancy > 5 && occupancy < 10)
+                {
+                    hotelLists = await _IHotel.GetAllAsync(u => u.AvailableRooms > 3 && u.AvailableRooms < 10);
+                }
+                else if(occupancy > 10)
+                {
+                    hotelLists = await _IHotel.GetAllAsync(u=> u.AvailableRooms > 5);
+                }else
+                {
+                    hotelLists = await _IHotel.GetAllAsync();
+                }
+
                 response.Result = _IMapper.Map<List<HotelsDTO>>(hotelLists);
                 response.HttpStatusCode = HttpStatusCode.OK;
                 response.IsSuccess = true;

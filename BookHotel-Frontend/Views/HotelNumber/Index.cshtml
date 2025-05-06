@@ -16,8 +16,8 @@
     <table class="table">
         <thead>
             <tr>
-                <th>Hotel Name</th>
-                <th>Hotel Number</th>
+                <th>Hotel Name</th>              
+                <th>Special details</th>
                 <th>Actions</th>
             </tr>
         </thead>
@@ -26,7 +26,7 @@
             {
                 <tr>
                     <td>@item.Hotels.Name</td>
-                    <td>@item.HotelNumber</td>
+                    <td>@item.SpecialDetails</td>                   
                     <td>
                         <a asp-controller="HotelNumber" asp-action="Update" asp-route-HotelNoId="@item.HotelNumber" class="btn btn-success">
                             Update

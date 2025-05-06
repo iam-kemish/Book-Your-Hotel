@@ -16,6 +16,8 @@ namespace Book_Your_Hotel.Models.DTOs
 
         [Required]
         public string ImageUrl { get; set; }
+        [Required]
+        public int Occupancy { get; set; }
 
         [Required]
         public int NumberOfRooms { get; set; }

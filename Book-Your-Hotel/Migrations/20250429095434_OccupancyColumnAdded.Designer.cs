@@ -4,6 +4,7 @@ using Book_Your_Hotel.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Book_Your_Hotel.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250429095434_OccupancyColumnAdded")]
+    partial class OccupancyColumnAdded
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -55,9 +58,6 @@ namespace Book_Your_Hotel.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("AvailableRooms")
-                        .HasColumnType("int");
-
                     b.Property<string>("ContactNumber")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -97,7 +97,6 @@ namespace Book_Your_Hotel.Migrations
                         new
                         {
                             Id = 1,
-                            AvailableRooms = 10,
                             ContactNumber = "+977-9800000001",
                             CreatedOn = new DateTime(2024, 1, 1, 12, 0, 0, 0, DateTimeKind.Unspecified),
                             ImageUrl = "https://www.dotnetmastery.com/bluevillaimages/villa1.jpg",
@@ -111,7 +110,6 @@ namespace Book_Your_Hotel.Migrations
                         new
                         {
                             Id = 2,
-                            AvailableRooms = 5,
                             ContactNumber = "+977-9800000002",
                             CreatedOn = new DateTime(2024, 1, 2, 14, 30, 0, 0, DateTimeKind.Unspecified),
                             ImageUrl = "https://www.dotnetmastery.com/bluevillaimages/villa2.jpg",
@@ -125,7 +123,6 @@ namespace Book_Your_Hotel.Migrations
                         new
                         {
                             Id = 3,
-                            AvailableRooms = 15,
                             ContactNumber = "+977-9800000003",
                             CreatedOn = new DateTime(2024, 1, 3, 10, 15, 0, 0, DateTimeKind.Unspecified),
                             ImageUrl = "https://www.dotnetmastery.com/bluevillaimages/villa3.jpg",
@@ -139,7 +136,6 @@ namespace Book_Your_Hotel.Migrations
                         new
                         {
                             Id = 4,
-                            AvailableRooms = 20,
                             ContactNumber = "+91-9800000004",
                             CreatedOn = new DateTime(2024, 1, 4, 8, 45, 0, 0, DateTimeKind.Unspecified),
                             ImageUrl = "https://www.dotnetmastery.com/bluevillaimages/villa4.jpg",
@@ -153,7 +149,6 @@ namespace Book_Your_Hotel.Migrations
                         new
                         {
                             Id = 5,
-                            AvailableRooms = 2,
                             ContactNumber = "+971-9800000005",
                             CreatedOn = new DateTime(2024, 1, 5, 17, 20, 0, 0, DateTimeKind.Unspecified),
                             ImageUrl = "https://www.dotnetmastery.com/bluevillaimages/villa5.jpg",
