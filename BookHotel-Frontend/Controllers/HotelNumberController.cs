@@ -4,6 +4,7 @@ using BookHotel_Frontend.Models.DTOs;
 using BookHotel_Frontend.Models.ViewModels;
 using BookHotel_Frontend.Services.IServices;
 using BookHotel_Utilities;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Newtonsoft.Json;
@@ -22,7 +23,7 @@ namespace BookHotel_Frontend.Controllers
             _IMapper = mapper;
             _IHotelService = IHotelService;
         }
-
+        [Authorize]
         public async Task<IActionResult> Index()
         {
             List<HotelNoDTO> ResultedList = new();

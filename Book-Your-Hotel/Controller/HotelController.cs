@@ -30,7 +30,7 @@ namespace Book_Your_Hotel.Controller
         [HttpGet]
 
         [ProducesResponseType(StatusCodes.Status200OK)]
-        public async Task<ActionResult<APIResponse>> GetAllHotels([FromQuery] int? occupancy, int PageSize = 2, int PageNumber = 1)
+        public async Task<ActionResult<APIResponse>> GetAllHotels([FromQuery] int? occupancy, int PageSize = 0, int PageNumber = 1)
         {
 
             try
