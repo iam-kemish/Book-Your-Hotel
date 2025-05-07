@@ -1,13 +1,16 @@
 ﻿using Book_Your_Hotel.Models;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
 namespace Book_Your_Hotel.Database
 {
-    public class ApplicationDbContext : DbContext
+    public class ApplicationDbContext : IdentityDbContext<AppUser>
     {
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
         {
         }
+       
+        public DbSet<AppUser> AppUsers { get; set; }
 
         public DbSet<Hotels> HotelLists { get; set; }
 
@@ -16,6 +19,7 @@ namespace Book_Your_Hotel.Database
         public DbSet<LocalUser> LocalUsers { get; set; }    
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            base.OnModelCreating(modelBuilder);
             modelBuilder.Entity<Hotels>().HasData(
                 new Hotels
                 {
