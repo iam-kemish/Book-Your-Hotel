@@ -90,14 +90,14 @@ namespace Book_Your_Hotel.Repositary
 
             if (result.Succeeded)
             {
-                //Testing purpose.
-                if (!_RoleManager.RoleExistsAsync("admin").GetAwaiter().GetResult())
+                //Testing purpose(Test completed).
+                if (!_RoleManager.RoleExistsAsync(registerationRequestDTO.Role).GetAwaiter().GetResult())
                 {
-                    await _RoleManager.CreateAsync(new IdentityRole("Admin"));
-                    await _RoleManager.CreateAsync(new IdentityRole("Costumer"));
+                    await _RoleManager.CreateAsync(new IdentityRole(registerationRequestDTO.Role));
+                   
                 }
 
-                await _UserManager.AddToRoleAsync(newUser, "Admin");
+                await _UserManager.AddToRoleAsync(newUser, registerationRequestDTO.Role);
                 var userToReturn = _Db.AppUsers.FirstOrDefault(u => u.UserName == registerationRequestDTO.UserName);
                 var userDto = _Imapper.Map<UserDTO>(userToReturn);
                 return userDto;

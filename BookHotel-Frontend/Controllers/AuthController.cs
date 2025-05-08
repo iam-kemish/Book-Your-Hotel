@@ -7,6 +7,7 @@ using BookHotel_Utilities;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Newtonsoft.Json;
 
 namespace BookHotel_Frontend.Controllers
@@ -53,16 +54,25 @@ namespace BookHotel_Frontend.Controllers
             }
         }
         [HttpGet]
-        public IActionResult Register() { 
-
-         return View();
+        public IActionResult Register() {
+            var rolelist = new List<SelectListItem>()
+            {
+                new SelectListItem{Text = StaticDetails.Admin, Value = StaticDetails.Admin},
+                 new SelectListItem{Text = StaticDetails.Customer, Value = StaticDetails.Customer}
+            };
+        ViewBag.rolelist = rolelist;
+            return View();
         }
 
 
-        [HttpPost("register")]
+        [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Register([FromBody] RegisterRequestDTO registerRequestDTO)
+        public async Task<IActionResult> Register(RegisterRequestDTO registerRequestDTO)
         {
+            if (string.IsNullOrEmpty(registerRequestDTO.Role))
+            {
+                registerRequestDTO.Role = StaticDetails.Customer;
+            }
             APIResponse aPIResponse = await _IAuth.RegisterAsync<APIResponse>(registerRequestDTO);
             if(aPIResponse != null && aPIResponse.IsSuccess)
             {
