@@ -71,7 +71,7 @@ namespace Book_Your_Hotel.Repositary
                 Token = tokenHandler.WriteToken(ResultedToken),
                 //returning the type of userdto with values of appuser, rather than returning appuser directly.
                 User = _Imapper.Map<UserDTO>(user),
-                Role = roles.FirstOrDefault()
+                //Role = roles.FirstOrDefault()
             };
             return dto;
         }

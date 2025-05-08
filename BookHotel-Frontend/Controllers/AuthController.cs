@@ -1,4 +1,5 @@
-﻿using System.Security.Claims;
+﻿using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
 using BookHotel_Frontend.Models;
 using BookHotel_Frontend.Models.DTOs;
 using BookHotel_Frontend.Services.IServices;
@@ -33,9 +34,11 @@ namespace BookHotel_Frontend.Controllers
             if(aPIResponse != null && aPIResponse.IsSuccess)
             {
                 LoginResponseDTO model = JsonConvert.DeserializeObject<LoginResponseDTO>(Convert.ToString(aPIResponse.Result));
+                var handler = new JwtSecurityTokenHandler();
+                var jwtExtraction = handler.ReadJwtToken(model.Token);
                 var identity = new ClaimsIdentity(CookieAuthenticationDefaults.AuthenticationScheme);
-                identity.AddClaim(new Claim(ClaimTypes.Name, model.User.UserName));
-                identity.AddClaim(new Claim(ClaimTypes.Role, model.User.Role));
+                identity.AddClaim(new Claim(ClaimTypes.Name, jwtExtraction.Claims.FirstOrDefault(u=>u.Type== "unique_name").Value));
+                identity.AddClaim(new Claim(ClaimTypes.Role, jwtExtraction.Claims.FirstOrDefault(u=>u.Type=="role").Value));
                 var Principal = new ClaimsPrincipal(identity);
                 await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, Principal);
                 HttpContext.Session.SetString(StaticDetails.SessionToken, model.Token);
@@ -56,9 +59,9 @@ namespace BookHotel_Frontend.Controllers
         }
 
 
-        [HttpPost]
+        [HttpPost("register")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Register(RegisterRequestDTO registerRequestDTO)
+        public async Task<IActionResult> Register([FromBody] RegisterRequestDTO registerRequestDTO)
         {
             APIResponse aPIResponse = await _IAuth.RegisterAsync<APIResponse>(registerRequestDTO);
             if(aPIResponse != null && aPIResponse.IsSuccess)
