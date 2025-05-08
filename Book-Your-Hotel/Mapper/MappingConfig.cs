@@ -19,7 +19,9 @@ namespace Book_Your_Hotel.Mapper
             CreateMap<HotelNumbers, HotelNoCreateDTO>().ReverseMap();
             CreateMap<HotelNumbers, HotelNoUpdateDTO>().ReverseMap();
 
-            CreateMap<RegisterationRequestDTO, LocalUser>().ReverseMap();
+            CreateMap<RegisterationRequestDTO, AppUser>().ReverseMap();
+
+            CreateMap<AppUser, UserDTO>().ReverseMap();
 
             
         }

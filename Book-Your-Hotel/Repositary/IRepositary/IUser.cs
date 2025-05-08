@@ -7,6 +7,6 @@ namespace Book_Your_Hotel.Repositary.IRepositary
     {
         bool IsUniqueUser(string user);
         Task<LoginResponseDTO> Login(LoginRequestDTO request);
-        Task<LocalUser> Register(RegisterationRequestDTO registerationRequestDTO);
+        Task<UserDTO> Register(RegisterationRequestDTO registerationRequestDTO);
     }
 }

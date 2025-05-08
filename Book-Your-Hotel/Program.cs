@@ -1,5 +1,4 @@
 using System.Text;
-using Asp.Versioning;
 using Book_Your_Hotel.Database;
 using Book_Your_Hotel.Mapper;
 using Book_Your_Hotel.Repositary;
@@ -9,8 +8,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
-using Asp.Versioning.Conventions;
 using Microsoft.AspNetCore.Identity;
+using Book_Your_Hotel.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -19,7 +18,7 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 {
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
 });
-builder.Services.AddIdentity<IdentityUser, IdentityRole>().AddEntityFrameworkStores<ApplicationDbContext>();
+builder.Services.AddIdentity<AppUser, IdentityRole>().AddEntityFrameworkStores<ApplicationDbContext>();
 builder.Services.AddResponseCaching();
 
 // Dependency Injection

@@ -6,6 +6,7 @@ using Book_Your_Hotel.Database;
 using Book_Your_Hotel.Models;
 using Book_Your_Hotel.Models.DTOs;
 using Book_Your_Hotel.Repositary.IRepositary;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 
@@ -16,17 +17,22 @@ namespace Book_Your_Hotel.Repositary
         private readonly ApplicationDbContext _Db;
         private string SecretKey;
         private readonly IMapper _Imapper;
-        public UserClass(ApplicationDbContext applicationDbContext, IConfiguration configuration, IMapper mapper)
+        private readonly UserManager<AppUser> _UserManager;
+        private readonly RoleManager<IdentityRole> _RoleManager;
+        public UserClass(ApplicationDbContext applicationDbContext, IConfiguration configuration, IMapper mapper, UserManager<AppUser> userManager, RoleManager<IdentityRole> roleManager)
         {
             _Db = applicationDbContext;
             SecretKey = configuration.GetValue<string>("JwtSettings:SecretKey");
             _Imapper = mapper;
+            _UserManager = userManager;
+            _RoleManager = roleManager;
         }
 
         public bool IsUniqueUser(string user)
         {
-            var checkUser = _Db.LocalUsers.FirstOrDefault(u=>u.UserName ==  user);
-            if (checkUser == null) {
+            var checkUser = _Db.AppUsers.FirstOrDefault(u => u.UserName == user);
+            if (checkUser == null)
+            {
                 return true;
             }
             return false;
@@ -35,12 +41,18 @@ namespace Book_Your_Hotel.Repositary
 
         public async Task<LoginResponseDTO> Login(LoginRequestDTO request)
         {
-            var user =  await _Db.LocalUsers.FirstOrDefaultAsync(u => u.UserName.ToLower() == request.UserName.ToLower() && u.Password == request.Password);
-            if (user == null)
-            {
-                return null;
-            }
+            var user = await _Db.AppUsers.FirstOrDefaultAsync(u => u.UserName.ToLower() == request.UserName.ToLower());
 
+            bool isValid = await _UserManager.CheckPasswordAsync(user, request.Password);
+            if (user == null || isValid == false)
+            {
+                return new LoginResponseDTO
+                {
+                    Token = "",
+                    User = null
+                };
+            }
+            var roles = await _UserManager.GetRolesAsync(user);
             var tokenHandler = new JwtSecurityTokenHandler();
             var key = Encoding.ASCII.GetBytes(SecretKey);
             var tokenDesc = new SecurityTokenDescriptor()
@@ -48,7 +60,7 @@ namespace Book_Your_Hotel.Repositary
                 Subject = new ClaimsIdentity(new Claim[]
                 {
                     new Claim(ClaimTypes.Name, user.Id.ToString()),
-                    new Claim(ClaimTypes.Role,user.Role)
+                    new Claim(ClaimTypes.Role,roles.FirstOrDefault())
                 }),
                 Expires = DateTime.UtcNow.AddDays(7),
                 SigningCredentials = new(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
@@ -57,30 +69,45 @@ namespace Book_Your_Hotel.Repositary
             LoginResponseDTO dto = new LoginResponseDTO()
             {
                 Token = tokenHandler.WriteToken(ResultedToken),
-                User = user
+                //returning the type of userdto with values of appuser, rather than returning appuser directly.
+                User = _Imapper.Map<UserDTO>(user),
+                Role = roles.FirstOrDefault()
             };
             return dto;
         }
-
-        public async Task<LocalUser> Register(RegisterationRequestDTO registerationRequestDTO)
+        public async Task<UserDTO> Register(RegisterationRequestDTO registerationRequestDTO)
         {
-            // var newUser = _Imapper.Map<LocalUser>(registerationRequestDTO);
-            // _Db.LocalUsers.Add(newUser);
-            //await  _Db.SaveChangesAsync();
-            // newUser.Password = "";
-            // return newUser;
-            LocalUser user = new()
+            //var newUser = _Imapper.Map<AppUser>(registerationRequestDTO);
+
+            AppUser newUser = new()
             {
                 UserName = registerationRequestDTO.UserName,
-                Password = registerationRequestDTO.Password,
-                Name = registerationRequestDTO.Name,
-                Role = registerationRequestDTO.Role
+                NormalizedEmail = registerationRequestDTO.UserName.ToUpper(),
+                Email = registerationRequestDTO.UserName,
+                Name = registerationRequestDTO.Name
             };
+            var result = await _UserManager.CreateAsync(newUser, registerationRequestDTO.Password);
 
-            _Db.LocalUsers.Add(user);
-            await _Db.SaveChangesAsync();
-            user.Password = "";
-            return user;
+            if (result.Succeeded)
+            {
+                //Testing purpose.
+                if (!_RoleManager.RoleExistsAsync("admin").GetAwaiter().GetResult())
+                {
+                    await _RoleManager.CreateAsync(new IdentityRole("Admin"));
+                    await _RoleManager.CreateAsync(new IdentityRole("Costumer"));
+                }
+
+                await _UserManager.AddToRoleAsync(newUser, "Admin");
+                var userToReturn = _Db.AppUsers.FirstOrDefault(u => u.UserName == registerationRequestDTO.UserName);
+                var userDto = _Imapper.Map<UserDTO>(userToReturn);
+                return userDto;
+            }
+
+            return null; // or throw exception / return error DTO
         }
+
+
+
     }
 }
+
