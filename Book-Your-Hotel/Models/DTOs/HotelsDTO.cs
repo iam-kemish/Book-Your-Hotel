@@ -8,6 +8,8 @@ namespace Book_Your_Hotel.Models.DTOs
         public string Name { get; set; }
         public string Location { get; set; }
         public string ImageUrl { get; set; }
+        public string? ImageLocalPath { get; set; }
+      
         public int Occupancy { get; set; }
         public int NumberOfRooms { get; set; }
 

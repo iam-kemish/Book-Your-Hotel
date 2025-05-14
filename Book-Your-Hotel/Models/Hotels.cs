@@ -14,7 +14,8 @@ namespace Book_Your_Hotel.Models
 
         public DateTime CreatedOn { get; set; }
         public DateTime UpdatedOn { get; set; }
-       public string ImageUrl { get; set; }
+        public string? ImageUrl { get; set; }
+        public string? ImageLocalPath { get; set; }
         public int AvailableRooms { get; set; }
         public int Occupancy { get; set; }
         public int NumberOfRooms { get; set; }

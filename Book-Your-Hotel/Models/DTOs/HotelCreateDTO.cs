@@ -10,9 +10,9 @@ namespace Book_Your_Hotel.Models.DTOs
         [Required]
         public string Location { get; set; }
 
-        [Required]
-        public string ImageUrl { get; set; }
-
+     
+        public string? ImageUrl { get; set; }
+        public IFormFile? Image { get; set; }
         [Required]
         public int NumberOfRooms { get; set; }
         [Required]
