@@ -22,7 +22,8 @@ namespace BookHotel_Frontend.Services
                 ApiType = StaticDetails.ApiType.POST,
                 Data = dto,
                 Url = HotelUrl+ "api/HotelLists",
-                token = Token
+                token = Token,
+                ContentType = StaticDetails.ContentType.MultipartFormData
             });
         }
 
@@ -63,7 +64,8 @@ namespace BookHotel_Frontend.Services
                 ApiType = StaticDetails.ApiType.PUT,
                 Data = dto,
                 Url = HotelUrl+ "api/HotelLists/" + dto.Id,
-                token = Token
+                token = Token,
+                ContentType = StaticDetails.ContentType.MultipartFormData
             });
         }
     }

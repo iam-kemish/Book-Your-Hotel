@@ -9,5 +9,7 @@ namespace BookHotel_Frontend.Models
         public object Data { get; set; }
 
         public string token { get; set; }   
+
+        public ContentType ContentType { get; set; } = ContentType.json;
     }
 }  
