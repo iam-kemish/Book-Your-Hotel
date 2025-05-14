@@ -24,11 +24,25 @@
                         <li class="nav-item">
                             <a class="nav-link text-dark"  asp-controller="Home" asp-action="Index">Home</a>
                         </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark"  asp-controller="Hotel" asp-action="Index">Hotels</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark"  asp-controller="HotelNumber" asp-action="Index">Hotel Numbers</a>
+
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                @if (User.IsInRole(StaticDetails.Admin))
+                                {
+                                    <span>Content Management (Admin) </span>
+                                }
+                                else
+                                {
+                                    <span>Hotel & Hotel Numbers</span>
+                                }
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" asp-area="" asp-controller="Hotel" asp-action="Index" disabled>Hotel</a></li>
+                                <li>
+                                    <a class="dropdown-item" asp-area="" asp-controller="HotelNumber" asp-action="Index" disabled>Hotel Number</a>
+                                </li>
+                                <li><hr class="dropdown-divider"></li>
+                            </ul>
                         </li>
 
                        
@@ -36,9 +50,10 @@
 
                     <ul class="navbar-nav">
 
-                        @if (httpAccessor.HttpContext.Session.GetString(StaticDetails.SessionToken) != null && 
-                        httpAccessor.HttpContext.Session.GetString(StaticDetails.SessionToken).ToString().Length > 0 ){
-
+                        @if(User.Identity.IsAuthenticated){
+                            <li class="nav-item">
+                                <a class="nav-link text-dark">Hello, @User.Identity.Name</a>
+                            </li>
                         <li class="nav-item">
                             <a class="nav-link text-dark"  asp-controller="Auth" asp-action="Logout">LogOut</a>
                         </li>

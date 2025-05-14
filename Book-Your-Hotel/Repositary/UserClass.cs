@@ -59,7 +59,7 @@ namespace Book_Your_Hotel.Repositary
             {
                 Subject = new ClaimsIdentity(new Claim[]
                 {
-                    new Claim(ClaimTypes.Name, user.Id.ToString()),
+                    new Claim(ClaimTypes.Name, user.UserName),
                     new Claim(ClaimTypes.Role,roles.FirstOrDefault())
                 }),
                 Expires = DateTime.UtcNow.AddDays(7),
