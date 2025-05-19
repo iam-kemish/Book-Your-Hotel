@@ -24,8 +24,45 @@ namespace BookHotel_Frontend.Services
             {
                 var client = HttpClient.CreateClient("HotelsApi");
                 HttpRequestMessage httpRequestMessage = new HttpRequestMessage();
+                if(apiRequest.ContentType == ContentType.MultipartFormData)
+                {
+
+                    httpRequestMessage.Headers.Add("Accept", "*");
+                }else
+                {
+
                 httpRequestMessage.Headers.Add("Accept", "application/json");
+                }
                 httpRequestMessage.RequestUri = new Uri(apiRequest.Url);
+             
+                if (apiRequest.ContentType == ContentType.MultipartFormData)
+                {
+                    var content = new MultipartFormDataContent();
+                    foreach (var item in apiRequest.Data.GetType().GetProperties())
+                    {
+                        // Get the value of the current property
+                        var value = item.GetValue(apiRequest.Data);
+                        if (value is FormFile)
+                        {
+                            //the returned value is of type object even if it's formfile
+                            var file = (FormFile)value;
+                            if (file != null)
+                            {
+                                // Add the file stream to the multipart content with the property name and file name
+                                content.Add(new StreamContent(file.OpenReadStream()), item.Name, file.FileName);
+                            }
+                        }
+                        else
+                        {
+                            // If it's not a file, convert it to a string and add it as regular form data
+                            // If the value is null, use an empty string
+                            content.Add(new StringContent(value == null ? "" : value.ToString()), item.Name);
+                        }
+                    }
+                    // Set the built multipart content as the body of the HTTP request
+                    httpRequestMessage.Content = content;
+                }
+
 
                 if (apiRequest.Data != null)
                 {
