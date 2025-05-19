@@ -166,7 +166,7 @@ namespace Book_Your_Hotel.Controller
 
             return CreatedAtAction(nameof(GetHotel), new { id = hotels.Id }, response);
         }
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = "admin")]
         [HttpDelete("{id:int}")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -184,6 +184,17 @@ namespace Book_Your_Hotel.Controller
             }
 
             var hotel = await _IHotel.GetAsync(u => u.Id == id);
+            if (!string.IsNullOrEmpty(hotel.ImageLocalPath))
+            {
+              
+                var oldImageDirectory = Path.Combine(Directory.GetCurrentDirectory(), hotel.ImageLocalPath);
+                // Check if file already exists, if so, delete it
+                FileInfo fileInfo = new FileInfo(oldImageDirectory);
+                if (fileInfo.Exists)
+                {
+                    fileInfo.Delete();
+                }
+            }
             if (hotel == null)
             {
                 response.HttpStatusCode = HttpStatusCode.NotFound;
@@ -198,13 +209,13 @@ namespace Book_Your_Hotel.Controller
 
             return Ok(response);
         }
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = "admin")]
         [HttpPut("{id:int}", Name = "UpdateHotel")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
-        public async Task<ActionResult<APIResponse>> UpdateHotel(int id, [FromBody] HotelUpdateDTO toUpdateDTO)
+        public async Task<ActionResult<APIResponse>> UpdateHotel(int id, [FromForm] HotelUpdateDTO toUpdateDTO)
         {
 
             if (id == 0 || toUpdateDTO.Id == 0)
@@ -215,18 +226,48 @@ namespace Book_Your_Hotel.Controller
                 return BadRequest(response);
             }
 
-            var existingHotel = await _IHotel.GetAsync(u => u.Id == id, tracked: true);
-            if (existingHotel == null)
+          Hotels hotels=   _IMapper.Map<Hotels>(toUpdateDTO);
+            await _IHotel.UpdateAsync(hotels);
+            if (toUpdateDTO.Image != null)
             {
-                response.HttpStatusCode = HttpStatusCode.NotFound;
-                response.IsSuccess = false;
-                response.Errors = new List<string> { "Hotel not found for update" };
-                return NotFound(response);
+                if (!string.IsNullOrEmpty(toUpdateDTO.ImageLocalPath))
+                {
+                    //Since its update we need to retrieve already existing imageurlpath in DB.
+                    var oldImageDirectory = Path.Combine(Directory.GetCurrentDirectory(), hotels.ImageLocalPath);
+                    // Check if file already exists, if so, delete it
+                    FileInfo fileInfo = new FileInfo(oldImageDirectory);
+                    if (fileInfo.Exists)
+                    {
+                        fileInfo.Delete();
+                    }
+                }
+                // Generate a unique file name using hotel ID and original file extension
+                string fileName = toUpdateDTO.Id + Path.GetExtension(toUpdateDTO.Image.FileName);
+
+                // Define the relative path to save the image in the wwwroot folder
+                string filePath = @"wwwroot\ResultedImages\" + fileName;
+
+                // Combine it with the current directory to get the full physical path
+                var directoryLocation = Path.Combine(Directory.GetCurrentDirectory(), filePath);
+
+               
+
+                // Save the uploaded file to the server
+                using (var fileStream = new FileStream(directoryLocation, FileMode.Create))
+                {
+                    toUpdateDTO.Image.CopyTo(fileStream);
+                }
+
+                // Generate the public URL of the image
+                var baseUrl = $"{HttpContext.Request.Scheme}://{HttpContext.Request.Host.Value}{HttpContext.Request.PathBase.Value}";
+
+                // Save image URL and local path to the hotel record
+                hotels.ImageUrl = baseUrl + "/ResultedImages/" + fileName;
+                hotels.ImageLocalPath = filePath;
+
+                // Update the hotel record with image info
+                await _IHotel.UpdateAsync(hotels);
             }
-
-            _IMapper.Map(toUpdateDTO, existingHotel);
-            await _IHotel.UpdateAsync(existingHotel);
-
             response.HttpStatusCode = HttpStatusCode.NoContent;
             response.IsSuccess = true;
 

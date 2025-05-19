@@ -86,7 +86,7 @@ namespace Book_Your_Hotel.Controller
             response.IsSuccess = true;
             return Ok(response);
         }
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = "admin")]
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -142,7 +142,7 @@ namespace Book_Your_Hotel.Controller
 
             return response;
         }
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = "admin")]
         [HttpPut("{id:int}", Name = "UpdateHotelNumber")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -179,7 +179,7 @@ namespace Book_Your_Hotel.Controller
 
             return response;
         }
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = "admin")]
         [HttpDelete("{id:int}")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
