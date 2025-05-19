@@ -4,6 +4,7 @@ using Book_Your_Hotel.Models;
 using Book_Your_Hotel.Models.DTOs;
 using Book_Your_Hotel.Repositary.IRepositary;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
 
@@ -103,7 +104,7 @@ namespace Book_Your_Hotel.Controller
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
-        public async Task<ActionResult<APIResponse>> CreateHotel([FromBody] HotelCreateDTO newHotel)
+        public async Task<ActionResult<APIResponse>> CreateHotel([FromForm] HotelCreateDTO newHotel)
         {
 
             if (newHotel == null)
@@ -125,6 +126,40 @@ namespace Book_Your_Hotel.Controller
             Hotels hotels = _IMapper.Map<Hotels>(newHotel);
             await _IHotel.CreateAsync(hotels);
 
+            if (newHotel.Image != null)
+            {
+                // Generate a unique file name using hotel ID and original file extension
+                string fileName = hotels.Id + Path.GetExtension(newHotel.Image.FileName);
+
+                // Define the relative path to save the image in the wwwroot folder
+                string filePath = @"wwwroot\ResultedImages\" + fileName;
+
+                // Combine it with the current directory to get the full physical path
+                var directoryLocation = Path.Combine(Directory.GetCurrentDirectory(), filePath);
+
+                // Check if file already exists, if so, delete it
+                FileInfo fileInfo = new FileInfo(directoryLocation);
+                if (fileInfo.Exists)
+                {
+                    fileInfo.Delete();
+                }
+
+                // Save the uploaded file to the server
+                using (var fileStream = new FileStream(directoryLocation, FileMode.Create))
+                {
+                    newHotel.Image.CopyTo(fileStream);
+                }
+
+                // Generate the public URL of the image
+                var baseUrl = $"{HttpContext.Request.Scheme}://{HttpContext.Request.Host.Value}{HttpContext.Request.PathBase.Value}";
+
+                // Save image URL and local path to the hotel record
+                hotels.ImageUrl = baseUrl + "/ResultedImages/" + fileName;
+                hotels.ImageLocalPath = filePath;
+
+                // Update the hotel record with image info
+                await _IHotel.UpdateAsync(hotels);
+            }
             response.Result = _IMapper.Map<HotelsDTO>(hotels);
             response.HttpStatusCode = HttpStatusCode.Created;
             response.IsSuccess = true;
