@@ -1,5 +1,6 @@
 ﻿using Asp.Versioning;
 using AutoMapper;
+using Azure;
 using Book_Your_Hotel.Models;
 using Book_Your_Hotel.Models.DTOs;
 using Book_Your_Hotel.Repositary.IRepositary;
@@ -77,27 +78,37 @@ namespace Book_Your_Hotel.Controller
         public async Task<ActionResult<APIResponse>> GetHotel(int id)
         {
 
-            if (id == 0)
+            try
             {
-                response.HttpStatusCode = HttpStatusCode.BadRequest;
-                response.IsSuccess = false;
-                response.Errors = new List<string> { "Invalid hotel ID" };
-                return BadRequest(response);
-            }
+                if (id == 0)
+                {
+                    response.HttpStatusCode = HttpStatusCode.BadRequest;
+                    response.IsSuccess = false;
+                    response.Errors = new List<string> { "Invalid hotel ID" };
+                    return BadRequest(response);
+                }
 
-            var hotel = await _IHotel.GetAsync(u => u.Id == id);
-            if (hotel == null)
+                var hotel = await _IHotel.GetAsync(u => u.Id == id);
+                if (hotel == null)
+                {
+                    response.HttpStatusCode = HttpStatusCode.NotFound;
+                    response.IsSuccess = false;
+                    response.Errors = new List<string> { "Hotel not found" };
+                    return NotFound(response);
+                }
+
+                response.Result = _IMapper.Map<HotelsDTO>(hotel);
+                response.HttpStatusCode = HttpStatusCode.OK;
+                response.IsSuccess = true;
+                return Ok(response);
+            }
+            catch (Exception ex)
             {
-                response.HttpStatusCode = HttpStatusCode.NotFound;
                 response.IsSuccess = false;
-                response.Errors = new List<string> { "Hotel not found" };
-                return NotFound(response);
+                response.Errors
+                     = new List<string>() { ex.ToString() };
             }
-
-            response.Result = _IMapper.Map<HotelsDTO>(hotel);
-            response.HttpStatusCode = HttpStatusCode.OK;
-            response.IsSuccess = true;
-            return Ok(response);
+            return response;
         }
         [Authorize]
         [HttpPost]
@@ -106,65 +117,71 @@ namespace Book_Your_Hotel.Controller
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         public async Task<ActionResult<APIResponse>> CreateHotel([FromForm] HotelCreateDTO newHotel)
         {
-
-            if (newHotel == null)
+            try
             {
-                response.HttpStatusCode = HttpStatusCode.BadRequest;
-                response.IsSuccess = false;
-                response.Errors = new List<string> { "Hotel data is null" };
-                return BadRequest(response);
-            }
-
-            if (await _IHotel.GetAsync(u => u.Name.ToLower() == newHotel.Name.ToLower()) != null)
-            {
-                response.HttpStatusCode = HttpStatusCode.BadRequest;
-                response.IsSuccess = false;
-                response.Errors = new List<string> { "Hotel with this name already exists" };
-                return BadRequest(response);
-            }
-
-            Hotels hotels = _IMapper.Map<Hotels>(newHotel);
-            await _IHotel.CreateAsync(hotels);
-
-            if (newHotel.Image != null)
-            {
-                // Generate a unique file name using hotel ID and original file extension
-                string fileName = hotels.Id + Path.GetExtension(newHotel.Image.FileName);
-
-                // Define the relative path to save the image in the wwwroot folder
-                string filePath = @"wwwroot\ResultedImages\" + fileName;
-
-                // Combine it with the current directory to get the full physical path
-                var directoryLocation = Path.Combine(Directory.GetCurrentDirectory(), filePath);
-
-                // Check if file already exists, if so, delete it
-                FileInfo fileInfo = new FileInfo(directoryLocation);
-                if (fileInfo.Exists)
+                if (newHotel == null)
                 {
-                    fileInfo.Delete();
+                   
+                    return BadRequest(newHotel);
                 }
 
-                // Save the uploaded file to the server
-                using (var fileStream = new FileStream(directoryLocation, FileMode.Create))
+                if (await _IHotel.GetAsync(u => u.Name.ToLower() == newHotel.Name.ToLower()) != null)
                 {
-                    newHotel.Image.CopyTo(fileStream);
+                    ModelState.AddModelError("Errors", "Hotel already Exists!");
+                    return BadRequest(ModelState);
                 }
 
-                // Generate the public URL of the image
-                var baseUrl = $"{HttpContext.Request.Scheme}://{HttpContext.Request.Host.Value}{HttpContext.Request.PathBase.Value}";
+                Hotels hotels = _IMapper.Map<Hotels>(newHotel);
+                await _IHotel.CreateAsync(hotels);
 
-                // Save image URL and local path to the hotel record
-                hotels.ImageUrl = baseUrl + "/ResultedImages/" + fileName;
-                hotels.ImageLocalPath = filePath;
+                if (newHotel.Image != null)
+                {
+                    // Generate a unique file name using hotel ID and original file extension
+                    string fileName = hotels.Id + Path.GetExtension(newHotel.Image.FileName);
 
-                // Update the hotel record with image info
-                await _IHotel.UpdateAsync(hotels);
+                    // Define the relative path to save the image in the wwwroot folder
+                    string filePath = @"wwwroot\ResultedImages\" + fileName;
+
+                    // Combine it with the current directory to get the full physical path
+                    var directoryLocation = Path.Combine(Directory.GetCurrentDirectory(), filePath);
+
+                    // Check if file already exists, if so, delete it
+                    FileInfo fileInfo = new FileInfo(directoryLocation);
+                    if (fileInfo.Exists)
+                    {
+                        fileInfo.Delete();
+                    }
+
+                    // Save the uploaded file to the server
+                    using (var fileStream = new FileStream(directoryLocation, FileMode.Create))
+                    {
+                        newHotel.Image.CopyTo(fileStream);
+                    }
+
+                    // Generate the public URL of the image
+                    var baseUrl = $"{HttpContext.Request.Scheme}://{HttpContext.Request.Host.Value}{HttpContext.Request.PathBase.Value}";
+
+                    // Save image URL and local path to the hotel record
+                    hotels.ImageUrl = baseUrl + "/ResultedImages/" + fileName;
+                    hotels.ImageLocalPath = filePath;
+
+                    // Update the hotel record with image info
+                    await _IHotel.UpdateAsync(hotels);
+                }
+                response.Result = _IMapper.Map<HotelsDTO>(hotels);
+                response.HttpStatusCode = HttpStatusCode.Created;
+                response.IsSuccess = true;
+
+                return CreatedAtAction(nameof(GetHotel), new { id = hotels.Id }, response);
             }
-            response.Result = _IMapper.Map<HotelsDTO>(hotels);
-            response.HttpStatusCode = HttpStatusCode.Created;
-            response.IsSuccess = true;
+            catch (Exception ex)
+            {
+                response.IsSuccess = false;
+                response.Errors
+                     = new List<string>() { ex.ToString() };
+            }
+            return response;
 
-            return CreatedAtAction(nameof(GetHotel), new { id = hotels.Id }, response);
         }
         [Authorize(Roles = "admin")]
         [HttpDelete("{id:int}")]

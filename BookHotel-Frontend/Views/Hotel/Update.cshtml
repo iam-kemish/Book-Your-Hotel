@@ -1,6 +1,6 @@
 ﻿@model HotelUpdateDTO
 
-<form asp-action="Update">
+<form asp-action="Update" enctype="multipart/form-data">
     <br />
     <div class="container border p-4 rounded shadow-sm">
         <h2 class="text-secondary mb-4">Update Hotel</h2>
@@ -29,7 +29,9 @@
                 <div class="mb-3 row">
                     <label asp-for="ImageUrl" class="col-sm-3 col-form-label fw-semibold">Image URL</label>
                     <div class="col-sm-9">
-                        <input asp-for="ImageUrl" class="form-control" />
+                        <input asp-for="ImageUrl" class="form-control" hidden/>
+                        <input asp-for="Image" class="form-control" />
+                        <input asp-for="ImageLocalPath" class="form-control" hidden />
                     </div>
                 </div>
 

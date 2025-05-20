@@ -27,7 +27,7 @@ namespace BookHotel_Frontend.Services
                 if(apiRequest.ContentType == ContentType.MultipartFormData)
                 {
 
-                    httpRequestMessage.Headers.Add("Accept", "*");
+                    httpRequestMessage.Headers.Add("Accept", "*/*");
                 }else
                 {
 
@@ -62,12 +62,15 @@ namespace BookHotel_Frontend.Services
                     // Set the built multipart content as the body of the HTTP request
                     httpRequestMessage.Content = content;
                 }
-
-
-                if (apiRequest.Data != null)
+                else
                 {
-                    httpRequestMessage.Content = new StringContent(JsonConvert.SerializeObject(apiRequest.Data), Encoding.UTF8, "application/json");
+                    if (apiRequest.Data != null)
+                    {
+                        httpRequestMessage.Content = new StringContent(JsonConvert.SerializeObject(apiRequest.Data), Encoding.UTF8, "application/json");
+                    }
                 }
+
+               
 
                 // Set request method based on ApiType
                 switch (apiRequest.ApiType)
