@@ -6,6 +6,6 @@ namespace BookHotel_Frontend.Services.IServices
     {
         APIResponse APIResponse { get; set; }
 
-        Task<T> SendAsync<T>(ApiRequest apiRequest);
+        Task<T> SendAsync<T>(ApiRequest apiRequest, bool withBearer = true);
     }
 }

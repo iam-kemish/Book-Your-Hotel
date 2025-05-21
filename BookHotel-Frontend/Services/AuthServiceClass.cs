@@ -28,7 +28,7 @@ namespace BookHotel_Frontend.Services
                  Data = loginRequestDTO,
                  Url = HotelNoUrl+"api/Users/Login/",
                  
-             }
+             }, withBearer:false
 
              );
         }
@@ -41,7 +41,7 @@ namespace BookHotel_Frontend.Services
                  ApiType = StaticDetails.ApiType.POST,
                  Data = registerRequestDTO,
                  Url = HotelNoUrl+ "api/Users/Register/"
-             }
+             }, withBearer:false
 
              );
         }

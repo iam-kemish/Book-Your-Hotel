@@ -20,7 +20,7 @@ namespace BookHotel_Frontend.Services
             this.HttpClient = httpClientFactory;
             _IToken = iToken;
         }
-        public async Task<T> SendAsync<T>(ApiRequest apiRequest)
+        public async Task<T> SendAsync<T>(ApiRequest apiRequest, bool withBearer = true)
         {
             try
             {
@@ -36,7 +36,7 @@ namespace BookHotel_Frontend.Services
                 httpRequestMessage.Headers.Add("Accept", "application/json");
                 }
                 httpRequestMessage.RequestUri = new Uri(apiRequest.Url);
-                if (_IToken.GetToken() != null) { 
+                if (withBearer && _IToken.GetToken() != null) { 
                     //stored token in a variable
                   var token = _IToken.GetToken();
                     client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token.Token);
