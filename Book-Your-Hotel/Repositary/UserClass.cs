@@ -49,7 +49,7 @@ namespace Book_Your_Hotel.Repositary
                 return new LoginResponseDTO
                 {
                     Token = "",
-                    User = null
+                 
                 };
             }
             var roles = await _UserManager.GetRolesAsync(user);
@@ -69,9 +69,7 @@ namespace Book_Your_Hotel.Repositary
             LoginResponseDTO dto = new LoginResponseDTO()
             {
                 Token = tokenHandler.WriteToken(ResultedToken),
-                //returning the type of userdto with values of appuser, rather than returning appuser directly.
-                User = _Imapper.Map<UserDTO>(user),
-                //Role = roles.FirstOrDefault()
+              
             };
             return dto;
         }

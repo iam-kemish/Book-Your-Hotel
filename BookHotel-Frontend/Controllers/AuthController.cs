@@ -42,7 +42,7 @@ namespace BookHotel_Frontend.Controllers
                 identity.AddClaim(new Claim(ClaimTypes.Role, jwtExtraction.Claims.FirstOrDefault(u=>u.Type=="role").Value));
                 var Principal = new ClaimsPrincipal(identity);
                 await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, Principal);
-                HttpContext.Session.SetString(StaticDetails.SessionToken, model.Token);
+                HttpContext.Session.SetString(StaticDetails.AccessToken, model.Token);
                 return RedirectToAction("Index", "Home");
             }
             else
@@ -84,7 +84,7 @@ namespace BookHotel_Frontend.Controllers
         public async Task<IActionResult> Logout()
         {
             await HttpContext.SignOutAsync();
-            HttpContext.Session.SetString(StaticDetails.SessionToken, "");
+            HttpContext.Session.SetString(StaticDetails.AccessToken, "");
             return RedirectToAction("Index", "Home");
         }
 

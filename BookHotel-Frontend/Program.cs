@@ -12,7 +12,7 @@ builder.Services.AddControllersWithViews();
 builder.Services.AddAutoMapper(typeof(MappingConfig));
 builder.Services.AddHttpClient<IHotelService, HotelServiceClass>();
 builder.Services.AddScoped<IHotelService,HotelServiceClass>();
-
+builder.Services.AddScoped<IToken, TokenClass>();
 builder.Services.AddHttpClient<IAuthService, AuthServiceClass>();
 builder.Services.AddScoped<IAuthService, AuthServiceClass>();
 
