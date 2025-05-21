@@ -52,27 +52,16 @@ namespace Book_Your_Hotel.Repositary
                  
                 };
             }
-            var roles = await _UserManager.GetRolesAsync(user);
-            var tokenHandler = new JwtSecurityTokenHandler();
-            var key = Encoding.ASCII.GetBytes(SecretKey);
-            var tokenDesc = new SecurityTokenDescriptor()
-            {
-                Subject = new ClaimsIdentity(new Claim[]
-                {
-                    new Claim(ClaimTypes.Name, user.UserName),
-                    new Claim(ClaimTypes.Role,roles.FirstOrDefault())
-                }),
-                Expires = DateTime.UtcNow.AddDays(7),
-                SigningCredentials = new(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
-            };
-            var ResultedToken = tokenHandler.CreateToken(tokenDesc);
+             var resultedToken = await GetAccessToken(user);
             LoginResponseDTO dto = new LoginResponseDTO()
             {
-                Token = tokenHandler.WriteToken(ResultedToken),
-              
+                Token = resultedToken
+
             };
             return dto;
         }
+
+     //
         public async Task<UserDTO> Register(RegisterationRequestDTO registerationRequestDTO)
         {
             //var newUser = _Imapper.Map<AppUser>(registerationRequestDTO);
@@ -104,7 +93,28 @@ namespace Book_Your_Hotel.Repositary
             return null; // or throw exception / return error DTO
         }
 
+        ////// token generating/////////
+        ///
 
+        public async Task<string> GetAccessToken(AppUser user)
+        {
+            var roles = await _UserManager.GetRolesAsync(user);
+            var tokenHandler = new JwtSecurityTokenHandler();
+            var key = Encoding.ASCII.GetBytes(SecretKey);
+            var tokenDesc = new SecurityTokenDescriptor()
+            {
+                Subject = new ClaimsIdentity(new Claim[]
+                {
+                    new Claim(ClaimTypes.Name, user.UserName),
+                    new Claim(ClaimTypes.Role,roles.FirstOrDefault())
+                }),
+                Expires = DateTime.UtcNow.AddDays(7),
+                SigningCredentials = new(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
+            };
+            var ResultedToken = tokenHandler.CreateToken(tokenDesc);
+            var TokenString = tokenHandler.WriteToken(ResultedToken);
+            return TokenString;
+        }
 
     }
 }
