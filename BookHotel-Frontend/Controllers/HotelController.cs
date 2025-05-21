@@ -24,7 +24,7 @@ namespace BookHotel_Frontend.Controllers
         public async Task<IActionResult> Index()
         {
             List<HotelsDTO> ResultedList = new();
-            var response = await _IHotel.GetAllAsync<APIResponse>(HttpContext.Session.GetString(StaticDetails.AccessToken));
+            var response = await _IHotel.GetAllAsync<APIResponse>();
             if (response != null && response.IsSuccess)
             {
                 ResultedList = JsonConvert.DeserializeObject<List<HotelsDTO>>(Convert.ToString(response.Result));
@@ -43,7 +43,7 @@ namespace BookHotel_Frontend.Controllers
         {
             if (ModelState.IsValid)
             {
-                var response = await _IHotel.CreateAsync<APIResponse>(hotelCreateDTO, HttpContext.Session.GetString(StaticDetails.AccessToken));
+                var response = await _IHotel.CreateAsync<APIResponse>(hotelCreateDTO );
                 if (response != null && response.IsSuccess)
                 {
                     TempData["success"] = "Hotel created successfully!";
@@ -59,7 +59,7 @@ namespace BookHotel_Frontend.Controllers
 
         public async Task<IActionResult> Update(int hotelId)
         {
-            var response = await _IHotel.GetAsync<APIResponse>(hotelId, HttpContext.Session.GetString(StaticDetails.AccessToken));
+            var response = await _IHotel.GetAsync<APIResponse>(hotelId );
             if (response != null && response.IsSuccess)
             {
                 HotelsDTO hotelsDTO = JsonConvert.DeserializeObject<HotelsDTO>(Convert.ToString(response.Result));
@@ -74,7 +74,7 @@ namespace BookHotel_Frontend.Controllers
         {
             if (ModelState.IsValid)
             {
-                var response = await _IHotel.UpdateAsync<APIResponse>(hotelUpdateDTO, HttpContext.Session.GetString(StaticDetails.AccessToken));
+                var response = await _IHotel.UpdateAsync<APIResponse>(hotelUpdateDTO);
                 if (response != null && response.IsSuccess)
                 {
                     TempData["success"] = "Hotel updated successfully!";
@@ -90,7 +90,7 @@ namespace BookHotel_Frontend.Controllers
 
         public async Task<IActionResult> Delete(int HotelId)
         {
-            var response = await _IHotel.GetAsync<APIResponse>(HotelId, HttpContext.Session.GetString(StaticDetails.AccessToken));
+            var response = await _IHotel.GetAsync<APIResponse>(HotelId );
             if (response != null && response.IsSuccess)
             {
                 HotelsDTO hotelsDTO = JsonConvert.DeserializeObject<HotelsDTO>(Convert.ToString(response.Result));
@@ -103,7 +103,7 @@ namespace BookHotel_Frontend.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Delete(HotelsDTO hotelsDTO)
         {
-            var response = await _IHotel.DeleteAsync<APIResponse>(hotelsDTO.Id, HttpContext.Session.GetString(StaticDetails.AccessToken));
+            var response = await _IHotel.DeleteAsync<APIResponse>(hotelsDTO.Id );
             if (response != null && response.IsSuccess)
             {
                 TempData["success"] = "Hotel deleted successfully!";

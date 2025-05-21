@@ -10,7 +10,9 @@ namespace BookHotel_Frontend.Services
     {
         private readonly IHttpClientFactory _httpClientFactory;
         private string HotelNoUrl;
-        public AuthServiceClass(IHttpClientFactory httpClientFactory, IConfiguration configuration) : base(httpClientFactory)
+        private readonly IToken _IToken;
+        //since baseservice now expects two parameters,
+        public AuthServiceClass(IHttpClientFactory httpClientFactory, IConfiguration configuration, IToken token) : base(httpClientFactory,token)
         {
             _httpClientFactory = httpClientFactory;
             HotelNoUrl = configuration.GetValue<string>("ServiceUrls:BookHotelApi");

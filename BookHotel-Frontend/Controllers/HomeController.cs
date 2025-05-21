@@ -22,7 +22,8 @@ namespace BookHotel_Frontend.Controllers
         public async Task<IActionResult> Index()
         {
             List<HotelsDTO> ResultedList = new();
-            var response = await _IHotel.GetAllAsync<APIResponse>(HttpContext.Session.GetString("JWTToken"));
+            // this isnt now needed because we are now getting token using cookies 
+            var response = await _IHotel.GetAllAsync<APIResponse>();
             if (response != null && response.IsSuccess)
             {
                 ResultedList = JsonConvert.DeserializeObject<List<HotelsDTO>>(Convert.ToString(response.Result));

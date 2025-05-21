@@ -13,10 +13,12 @@ namespace BookHotel_Frontend.Services
     {
         public APIResponse APIResponse { get; set; }
         public IHttpClientFactory HttpClient { get; set; }
-        public BaseServiceClass(IHttpClientFactory httpClientFactory)
+        private readonly IToken _IToken;
+        public BaseServiceClass(IHttpClientFactory httpClientFactory, IToken iToken)
         {
             this.APIResponse = new APIResponse();
-            this.HttpClient = httpClientFactory; 
+            this.HttpClient = httpClientFactory;
+            _IToken = iToken;
         }
         public async Task<T> SendAsync<T>(ApiRequest apiRequest)
         {
@@ -34,7 +36,11 @@ namespace BookHotel_Frontend.Services
                 httpRequestMessage.Headers.Add("Accept", "application/json");
                 }
                 httpRequestMessage.RequestUri = new Uri(apiRequest.Url);
-             
+                if (_IToken.GetToken() != null) { 
+                    //stored token in a variable
+                  var token = _IToken.GetToken();
+                    client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token.Token);
+                }
                 if (apiRequest.ContentType == ContentType.MultipartFormData)
                 {
                     var content = new MultipartFormDataContent();

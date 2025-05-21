@@ -15,10 +15,11 @@ namespace BookHotel_Frontend.Controllers
     public class AuthController : Controller
     {
         private readonly IAuthService _IAuth;
-
-        public AuthController(IAuthService authService)
+        private readonly IToken _IToken;
+        public AuthController(IAuthService authService, IToken iToken)
         {
             _IAuth = authService;
+            _IToken = iToken;
         }
         [HttpGet]
         public IActionResult Login()
@@ -42,7 +43,7 @@ namespace BookHotel_Frontend.Controllers
                 identity.AddClaim(new Claim(ClaimTypes.Role, jwtExtraction.Claims.FirstOrDefault(u=>u.Type=="role").Value));
                 var Principal = new ClaimsPrincipal(identity);
                 await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, Principal);
-                HttpContext.Session.SetString(StaticDetails.AccessToken, model.Token);
+                _IToken.SetToken(model);
                 return RedirectToAction("Index", "Home");
             }
             else
@@ -84,7 +85,7 @@ namespace BookHotel_Frontend.Controllers
         public async Task<IActionResult> Logout()
         {
             await HttpContext.SignOutAsync();
-            HttpContext.Session.SetString(StaticDetails.AccessToken, "");
+           _IToken.ClearToken();
             return RedirectToAction("Index", "Home");
         }
 
