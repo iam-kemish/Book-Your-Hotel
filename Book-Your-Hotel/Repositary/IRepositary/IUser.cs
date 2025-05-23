@@ -8,6 +8,7 @@ namespace Book_Your_Hotel.Repositary.IRepositary
         bool IsUniqueUser(string user);
         Task<LoginResponseDTO> Login(LoginRequestDTO request);
         Task<UserDTO> Register(RegisterationRequestDTO registerationRequestDTO);
-        Task<LoginResponseDTO> RefreshAccessToken(LoginRequestDTO request);
+        Task<LoginResponseDTO> RefreshAccessToken(LoginResponseDTO request);
     }
 }
+ 

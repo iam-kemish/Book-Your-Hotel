@@ -60,5 +60,31 @@ namespace Book_Your_Hotel.Controller
             return Ok(_ApiResponse);
 
         }
+
+        [HttpPost("RefreshToken")]
+        public async Task<ActionResult<APIResponse>> RefreshAccessToken([FromBody] LoginResponseDTO loginResponseDTO)
+        {
+            if (ModelState.IsValid)
+            {
+                var tokenDTOResponse = await _IUser.RefreshAccessToken(loginResponseDTO);
+                if (tokenDTOResponse == null && string.IsNullOrEmpty(tokenDTOResponse.RefreshToken)) {
+                    _ApiResponse.HttpStatusCode = System.Net.HttpStatusCode.BadRequest;
+                    _ApiResponse.IsSuccess = false;
+                    _ApiResponse.Errors.Add("Token invalid");
+                    return BadRequest(_ApiResponse);
+                }
+                _ApiResponse.HttpStatusCode = System.Net.HttpStatusCode.OK;
+                _ApiResponse.IsSuccess = true;               
+                return BadRequest(_ApiResponse);
+             } 
+            else
+            {
+                    _ApiResponse.HttpStatusCode = System.Net.HttpStatusCode.BadRequest;
+                    _ApiResponse.IsSuccess = false;
+                    _ApiResponse.Errors.Add("Invalid user credentials");
+                    return BadRequest(_ApiResponse);
+                
+            }
+        }
     }
 }

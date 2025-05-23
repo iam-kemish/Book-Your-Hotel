@@ -52,7 +52,8 @@ namespace Book_Your_Hotel.Repositary
                  
                 };
             }
-             var resultedToken = await GetAccessToken(user);
+            var JwtTokenId = $"JTI{Guid.NewGuid()}";
+             var resultedToken = await GetAccessToken(user, JwtTokenId);
             LoginResponseDTO dto = new LoginResponseDTO()
             {
                 Token = resultedToken
@@ -96,7 +97,7 @@ namespace Book_Your_Hotel.Repositary
         ////// token generating/////////
         ///
 
-        public async Task<string> GetAccessToken(AppUser user)
+        public async Task<string> GetAccessToken(AppUser user, string jwtTokenId)
         {
             var roles = await _UserManager.GetRolesAsync(user);
             var tokenHandler = new JwtSecurityTokenHandler();
@@ -106,7 +107,9 @@ namespace Book_Your_Hotel.Repositary
                 Subject = new ClaimsIdentity(new Claim[]
                 {
                     new Claim(ClaimTypes.Name, user.UserName),
-                    new Claim(ClaimTypes.Role,roles.FirstOrDefault())
+                    new Claim(ClaimTypes.Role,roles.FirstOrDefault()),
+                    new Claim(JwtRegisteredClaimNames.Jti, jwtTokenId),
+                    new Claim(JwtRegisteredClaimNames.Sub, user.Id)
                 }),
                 Expires = DateTime.UtcNow.AddDays(7),
                 SigningCredentials = new(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
@@ -116,6 +119,25 @@ namespace Book_Your_Hotel.Repositary
             return TokenString;
         }
 
+        public Task<LoginResponseDTO> RefreshAccessToken(LoginResponseDTO request)
+        {
+            throw new NotImplementedException();
+        }
+        private(bool isSuccessful, string jwtTokenId, string TokenId) GetAccessTokenData(string AccessToken)
+        {
+            try
+            {
+                var tokenHandler = new JwtSecurityTokenHandler();
+                var Principal = tokenHandler.ReadJwtToken(AccessToken);
+                var jwtTokenId = Principal.Claims.FirstOrDefault(u=> u.Type == JwtRegisteredClaimNames.Jti)?.Value;
+                var userId = Principal.Claims.FirstOrDefault(u => u.Type == JwtRegisteredClaimNames.Sub)?.Value;
+                return (true, jwtTokenId, userId);
+            }
+            catch
+            {
+                return (false, null, null); 
+            }
+        }
     }
 }
 
