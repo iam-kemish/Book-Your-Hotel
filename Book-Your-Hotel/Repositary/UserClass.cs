@@ -3,6 +3,7 @@ using System.Security.Claims;
 using System.Text;
 using AutoMapper;
 using Book_Your_Hotel.Database;
+using Book_Your_Hotel.Migrations;
 using Book_Your_Hotel.Models;
 using Book_Your_Hotel.Models.DTOs;
 using Book_Your_Hotel.Repositary.IRepositary;
@@ -48,15 +49,17 @@ namespace Book_Your_Hotel.Repositary
             {
                 return new LoginResponseDTO
                 {
-                    Token = "",
-                 
+                    Token = ""
+                   
                 };
             }
-            var JwtTokenId = $"JTI{Guid.NewGuid()}";
+            var JwtTokenId = $"JTI-{Guid.NewGuid()}";
              var resultedToken = await GetAccessToken(user, JwtTokenId);
+            var ResultedRefreshToken = await CreateRefreshToken(user.Id, JwtTokenId);
             LoginResponseDTO dto = new LoginResponseDTO()
             {
-                Token = resultedToken
+                Token = resultedToken,
+                 RefreshToken = ResultedRefreshToken
 
             };
             return dto;
@@ -119,23 +122,81 @@ namespace Book_Your_Hotel.Repositary
             return TokenString;
         }
 
-        public Task<LoginResponseDTO> RefreshAccessToken(LoginResponseDTO request)
+        public async Task<LoginResponseDTO> RefreshAccessToken(LoginResponseDTO request)
         {
-            throw new NotImplementedException();
+           //This method creates new accesstoken using refresh token//
+           //first we find an exisiting refresh token
+           var existingRefreshToken =await  _Db.RefreshTokens.FirstOrDefaultAsync(u=>u.Refresh_Token ==  request.RefreshToken);
+            if(existingRefreshToken == null)
+            {
+                return new LoginResponseDTO();
+            }
+            //now we compare user data from existing  token and refresh token if it didnt matched, it will be considered security alert.
+            var exisitingTokenData = GetAccessTokenData(request.Token);
+            if (!exisitingTokenData.isSuccessful || existingRefreshToken.JwtTokenId != exisitingTokenData.tokenId || existingRefreshToken.UserId != exisitingTokenData.tokenId)
+            {
+                //we mark exisiting refresh token as invalid
+                existingRefreshToken.IsValid = false;
+                _Db.SaveChanges();
+            }
+            //if invalid mark it invalid and return empty
+            if(existingRefreshToken.ExpiresAt < DateTime.UtcNow)
+            {
+                existingRefreshToken.IsValid = false;
+                _Db.SaveChanges();
+            }
+            //replace old refreshtoken with new one//
+            var newRefreshToken = await CreateRefreshToken(existingRefreshToken.UserId, existingRefreshToken.JwtTokenId);
+
+            //mark exisiting refresh token invalid
+            existingRefreshToken.IsValid = false;
+            _Db.SaveChanges();
+            //lets now create a new accessToken(Token)
+            var appUser = await _Db.Users.FirstOrDefaultAsync(u => u.Id == existingRefreshToken.UserId);
+            if(appUser == null)
+            {
+                return new LoginResponseDTO();
+            }
+            //we are using exisitng existingRefreshToken.JwtTokenId, so that after the accesstoken expires, we use to same user already logggedin information to create a new accesstoken
+            var newAccessToken = await GetAccessToken(appUser, existingRefreshToken.JwtTokenId);
+            return new LoginResponseDTO
+            {
+                Token = newAccessToken,
+                RefreshToken = newRefreshToken
+            };
+
+
         }
-        private(bool isSuccessful, string jwtTokenId, string TokenId) GetAccessTokenData(string AccessToken)
+
+        private async Task<string>  CreateRefreshToken(string userId, string TokenId)
+        {
+            RefreshToken refreshToken = new()
+            {
+                UserId = userId,
+                ExpiresAt = DateTime.UtcNow.AddDays(1),
+                JwtTokenId = TokenId,
+                Refresh_Token = Guid.NewGuid() + "_" + Guid.NewGuid(),
+                IsValid = true
+            };
+            await _Db.RefreshTokens.AddAsync(refreshToken);
+            await _Db.SaveChangesAsync();
+            return refreshToken.Refresh_Token;
+        }
+        private (bool isSuccessful, string userId, string tokenId) GetAccessTokenData(string accessToken)
         {
             try
             {
                 var tokenHandler = new JwtSecurityTokenHandler();
-                var Principal = tokenHandler.ReadJwtToken(AccessToken);
-                var jwtTokenId = Principal.Claims.FirstOrDefault(u=> u.Type == JwtRegisteredClaimNames.Jti)?.Value;
-                var userId = Principal.Claims.FirstOrDefault(u => u.Type == JwtRegisteredClaimNames.Sub)?.Value;
-                return (true, jwtTokenId, userId);
+                var principal = tokenHandler.ReadJwtToken(accessToken);
+
+                var TokenId = principal.Claims.FirstOrDefault(u => u.Type == JwtRegisteredClaimNames.Jti)?.Value;
+                var userId = principal.Claims.FirstOrDefault(u => u.Type == JwtRegisteredClaimNames.Sub)?.Value;
+
+                return (true, userId, TokenId);
             }
             catch
             {
-                return (false, null, null); 
+                return (false, null, null);
             }
         }
     }

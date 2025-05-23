@@ -15,6 +15,7 @@ namespace BookHotel_Frontend.Services
         public void ClearToken()
         {
             _contextAccessor.HttpContext?.Response.Cookies.Delete(StaticDetails.AccessToken);
+            _contextAccessor.HttpContext?.Response.Cookies.Delete(StaticDetails.RefreshToken);
         }
 
         public LoginResponseDTO? GetToken()
@@ -22,14 +23,17 @@ namespace BookHotel_Frontend.Services
             try
             {
                 bool hasAccessToken = _contextAccessor.HttpContext.Request.Cookies.TryGetValue(StaticDetails.AccessToken, out string AccessToken);
-             
-                    LoginResponseDTO loginResponseDTO = new()
+                bool hasRefreshToken = _contextAccessor.HttpContext.Request.Cookies.TryGetValue(StaticDetails.RefreshToken, out string Refresh_Token);
+
+                LoginResponseDTO loginResponseDTO = new()
                     {
-                        Token = AccessToken
+                        Token = AccessToken,
+                        RefreshToken = Refresh_Token
                     };
                 
-                    return hasAccessToken ? loginResponseDTO : null;
-                }
+                    return hasAccessToken  ? loginResponseDTO : null;
+              
+            }
             
             catch (Exception ex) {
                 return null;
@@ -40,6 +44,10 @@ namespace BookHotel_Frontend.Services
         public void SetToken(LoginResponseDTO loginResponseDTO)
         {
             _contextAccessor.HttpContext?.Response.Cookies.Append(StaticDetails.AccessToken, loginResponseDTO.Token, new CookieOptions
+            {
+                Expires = DateTimeOffset.UtcNow.AddDays(1)
+            });
+            _contextAccessor.HttpContext?.Response.Cookies.Append(StaticDetails.RefreshToken, loginResponseDTO.RefreshToken, new CookieOptions
             {
                 Expires = DateTimeOffset.UtcNow.AddDays(1)
             });
