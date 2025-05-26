@@ -137,12 +137,29 @@ namespace Book_Your_Hotel.Repositary
             {
                 //we mark exisiting refresh token as invalid
                 existingRefreshToken.IsValid = false;
-
                 _Db.SaveChanges();
+                return new LoginResponseDTO();
               
             }
+
+            //When someone try to use not valid refresh token//
+            //we firstly Retrieve all refresh tokens generated for the same user and linked to the same original JWT token ID
+            if (!existingRefreshToken.IsValid)
+            {
+                var chainOfRecords = _Db.RefreshTokens.Where(u => u.JwtTokenId == existingRefreshToken.JwtTokenId &&
+         u.UserId == existingRefreshToken.UserId);
+                foreach (var item in chainOfRecords)
+                {
+                    item.IsValid = false;
+                }
+                _Db.UpdateRange(chainOfRecords);
+                _Db.SaveChanges();
+                return new LoginResponseDTO();
+            }
+
+
             //if invalid mark it invalid and return empty,, here logic utcnow(this time) if exceeds the expiry time, it's invalid
-            if(existingRefreshToken.ExpiresAt < DateTime.UtcNow)
+            if (existingRefreshToken.ExpiresAt < DateTime.UtcNow)
             {
                 existingRefreshToken.IsValid = false;
                 _Db.SaveChanges();
