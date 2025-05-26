@@ -74,8 +74,10 @@ namespace Book_Your_Hotel.Controller
                     return BadRequest(_ApiResponse);
                 }
                 _ApiResponse.HttpStatusCode = System.Net.HttpStatusCode.OK;
-                _ApiResponse.IsSuccess = true;               
-                return BadRequest(_ApiResponse);
+                _ApiResponse.IsSuccess = true;
+              
+                _ApiResponse.Result = tokenDTOResponse;
+                return (_ApiResponse);
              } 
             else
             {

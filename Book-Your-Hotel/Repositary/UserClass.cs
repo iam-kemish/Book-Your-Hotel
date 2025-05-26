@@ -133,17 +133,20 @@ namespace Book_Your_Hotel.Repositary
             }
             //now we compare user data from existing  token and refresh token if it didnt matched, it will be considered security alert.
             var exisitingTokenData = GetAccessTokenData(request.Token);
-            if (!exisitingTokenData.isSuccessful || existingRefreshToken.JwtTokenId != exisitingTokenData.tokenId || existingRefreshToken.UserId != exisitingTokenData.tokenId)
+            if (!exisitingTokenData.isSuccessful || existingRefreshToken.JwtTokenId != exisitingTokenData.tokenId || existingRefreshToken.UserId != exisitingTokenData.userId)
             {
                 //we mark exisiting refresh token as invalid
                 existingRefreshToken.IsValid = false;
+
                 _Db.SaveChanges();
+              
             }
-            //if invalid mark it invalid and return empty
+            //if invalid mark it invalid and return empty,, here logic utcnow(this time) if exceeds the expiry time, it's invalid
             if(existingRefreshToken.ExpiresAt < DateTime.UtcNow)
             {
                 existingRefreshToken.IsValid = false;
                 _Db.SaveChanges();
+                return new LoginResponseDTO();
             }
             //replace old refreshtoken with new one//
             var newRefreshToken = await CreateRefreshToken(existingRefreshToken.UserId, existingRefreshToken.JwtTokenId);
@@ -173,7 +176,7 @@ namespace Book_Your_Hotel.Repositary
             RefreshToken refreshToken = new()
             {
                 UserId = userId,
-                ExpiresAt = DateTime.UtcNow.AddDays(1),
+                ExpiresAt = DateTime.UtcNow.AddMinutes(2),
                 JwtTokenId = TokenId,
                 Refresh_Token = Guid.NewGuid() + "_" + Guid.NewGuid(),
                 IsValid = true
